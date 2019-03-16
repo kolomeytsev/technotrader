@@ -27,7 +27,7 @@ This project was inspired by the following open source project: [Online Portfoli
 
 Yury Kolomeytsev
 
-Mcs student from Skolkovo Institute of Science and Technology
+Msc student from Skolkovo Institute of Science and Technology
 
 yury.kolomeytsev@gmail.com
 
