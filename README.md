@@ -10,8 +10,24 @@ Install dependencies via ```pip install -r requirements.txt```
 
 Python 3.6 on MacOS is supported.
 
-## Instalation
+## Installation
 
  * Download or clone the latest version from [GitHub](https://github.com/kolomeytsev/technotrader/).
  * Run the platform via ```python main.py```
  
+## User Guide
+
+For more detailed information about the platform please read [User Guide](https://github.com/kolomeytsev/technotrader/user_guide.md).
+
+## Acknowledgement
+
+This project was inspired by the following open source project: [Online Portfolio Selection toolbox](https://github.com/OLPS/OLPS).
+
+## Author
+
+Yury Kolomeytsev
+
+Mcs student from Skolkovo Institute of Science and Technology
+
+yury.kolomeytsev@gmail.com
+
