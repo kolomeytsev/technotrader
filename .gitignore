@@ -74,12 +74,6 @@ target/
 # pyenv
 .python-version
 
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
 # dotenv
 .env
 
@@ -106,12 +100,6 @@ ENV/
 
 # Local databases
 *.db
-
-# Private info
-common/config.py
-
-# Backtest results
-blocks/results
 
 # CSVs
 *.csv
