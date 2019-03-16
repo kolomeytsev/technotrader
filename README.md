@@ -1,6 +1,6 @@
 # technotrader
 
-TechnoTrader is a platform for on-Line portfolio selection which includes a library of classical and state-of-the-art on-line portofolio selection strategies implemented in Python. This platform has user-friendly GUI for backtesting strategies and analyzing results. One can easily add their own strategies following convenient interface.
+TechnoTrader is a platform for online portfolio selection which includes a library of classical and state-of-the-art on-line portofolio selection strategies implemented in Python. This platform has user-friendly GUI for backtesting strategies and analyzing results. One can easily add their own strategies following convenient interface.
 
 ## Prerequisites
 
