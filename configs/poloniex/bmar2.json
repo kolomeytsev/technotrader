@@ -1,0 +1,1 @@
+{"instruments_list": ["ETH/BTC", "XRP/BTC", "EOS/BTC", "LTC/BTC", "STR/BTC", "DASH/BTC", "XMR/BTC", "ETC/BTC", "XEM/BTC", "ZEC/BTC"], "price_label": "close", "use_risk_free": false, "short_flag": false, "neutralize_flag": true, "projection_method": "simplex", "top_amount": 1, "alphas": [0.3, 0.5, 0.6], "eta": 10, "epsilon": 10.0}
