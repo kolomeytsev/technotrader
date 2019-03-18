@@ -211,8 +211,9 @@ class ExchangeTimetable:
 
 
 class DataExtractor:
-    def __init__(self, timetable, config, amount, 
-                    return_price_relatives=None, relevant_columns=None, return_pandas=False):
+    def __init__(self, data_loader, timetable, config, amount, 
+                return_price_relatives=None, relevant_columns=None, return_pandas=False):
+        self.data_loader = data_loader
         self.timetable = timetable
         self.step = config["step"]
         if config.get("use_risk_free") is not None:
@@ -234,21 +235,16 @@ class DataExtractor:
                 ])
                 for label in config["instruments_list"]
             ]
-        print("relevant_columns")
-        print(self.relevant_columns)
 
     def __call__(self, epoch, amount=None, relatives=None):
         if amount is None:
             amount = self.amount
         output_times = self.timetable.get_last_epochs(epoch, self.step, amount)
-        #data_block = client.block_results(self.data_block_name, output_times)
-        print("output_times:", output_times)
-        #data = []
-        #for epoch, epoch_data in data_block.items():
-        #    new_epoch_data = [epoch_data[col] for col in self.relevant_columns]
-        #    data.append(new_epoch_data)
-        print("Generating random prices!")
-        data = np.random.random((5, len(self.relevant_columns)))
+        data_dict = self.data_loader.get_data(output_times)
+        data = []
+        for epoch, epoch_data in data_dict.items():
+            new_epoch_data = [epoch_data[col] for col in self.relevant_columns]
+            data.append(new_epoch_data)
         data = pd.DataFrame(data, columns=self.relevant_columns)
         data.fillna(method="pad", inplace=True)
         data.fillna(method="backfill", inplace=True)

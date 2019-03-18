@@ -10,5 +10,5 @@ class Agent:
         self.data_loader = data_loader
         self.trade_log = trade_log
 
-    def compute_portfolio(self):
+    def compute_portfolio(self, epoch):
         raise NotImplementedError()

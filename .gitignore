@@ -104,4 +104,6 @@ ENV/
 # CSVs
 *.csv
 
+database/
+
 .DS_Store

@@ -1,74 +1,96 @@
 import numpy as np
 import logging
+import time
 
 
 class Trader:
-    def __init__(self, waiting_period, config, total_steps, net_dir, 
-                agent, initial_capital=1.0, agent_type="nn"):
-        self._steps = 0
-        self._total_steps = total_steps
-        self._period = waiting_period
-        
-        self._agent = agent
+    def __init__(self, config, data_loader, agent, trade_log=None,
+                initial_capital=1.0, waiting_period=0):   
+        self.config = config
+        self.data_loader = data_loader
+        self.agent = agent
+        self.trade_log = trade_log
+        self.instruments_list = config["instruments_list"]
+        self.price_label = config["price_label"]
+        self.relevant_columns = [
+            ">".join([
+                config["exchange"],
+                label,
+                config["candles_res"],
+                self.price_label
+            ])
+            for label in config["instruments_list"]
+        ]
+        self.steps = 0
+        self.total_capital = initial_capital
+        self.waiting_period = waiting_period
+        self.coin_number = len(config["instruments_list"])
+        self.commission_rate = config["fee"]
+        self.asset_vector = np.zeros(self.coin_number + 1)
+        self.last_weights = np.zeros((self.coin_number + 1,))
+        self.last_weights[-1] = 1.0
 
-        # the total assets is calculated with BTC
-        self._total_capital = initial_capital
-        self._coin_number = config["input"]["coin_number"]
-        self._commission_rate = config["trading"]["trading_consumption"]
-        self._fake_ratio = config["input"]["fake_ratio"]
-        self._asset_vector = np.zeros(self._coin_number+1)
-
-        self._last_weights = np.zeros((self._coin_number+1,))
-        self._last_weights[0] = 1.0
-
-        if self.__class__.__name__=="BackTest":
+        if self.__class__.__name__=="BackTester":
             # self._initialize_logging_data_frame(initial_BTC)
-            self._logging_data_frame = None
+            self.logging_data_frame = None
             # self._disk_engine =  sqlite3.connect('./database/back_time_trading_log.db')
             # self._initialize_data_base()
-        self._current_error_state = 'S000'
-        self._current_error_info = ''
+        self.current_error_state = 'S000'
+        self.current_error_info = ''
+
+        self.begin_epoch = config["begin"]
+        self.current_epoch = self.begin_epoch
+        self.end_epoch = config["end"]
+        self.step = config["step"]
+        #columns_list = ["return", "turnover"]
+        #self.full_result = {x : [] for x in columns_list} 
 
     def execute_trades(self, weights):
         pass
 
-    def rolling_train(self):
-        pass
+    def transform_weights_dict_to_array(self, weights):
+        weights_array = np.array([weights[inst] for inst in self.instruments_list])
+        risk_free_ampunt = 1 - np.abs(weights_array).sum()
+        weights_array = np.append(weights_array, risk_free_ampunt)
+        return weights_array
 
-    def __trade_body(self):
-        self._current_error_state = 'S000'
+    def trade_body(self):
+        self.current_error_state = 'S000'
         starttime = time.time()
-        weights = self._agent.decide_by_history(self.generate_history_matrix(),
-                                              self._last_weights.copy())
-        self.trade_by_strategy(weights)
-        if self._agent_type == "nn":
-            self.rolling_train()
-        if not self.__class__.__name__=="BackTest":
-            self._last_weights = weights.copy()
-        logging.info('total assets are %3f BTC' % self._total_capital)
-        logging.debug("="*30)
+        weights = self.agent.compute_portfolio(self.current_epoch)
+        weights = self.transform_weights_dict_to_array(weights)
+        self.execute_trades(weights)
+        if not self.__class__.__name__=="BackTester":
+            self.last_weights = weights.copy()
+        logging.info('total assets are %3f' % self.total_capital)
+        logging.debug("=" * 30)
         trading_time = time.time() - starttime
-        if trading_time < self._period:
-            logging.info("sleep for %s seconds" % (self._period - trading_time))
-        self._steps += 1
-        return self._period - trading_time
+        if trading_time < self.waiting_period:
+            logging.info("sleep for %s seconds" % (self.waiting_period - trading_time))
+        self.steps += 1
+        return self.waiting_period - trading_time
 
-    def start_trading(self):
+    def check_epoch_in_timetable(self, epoch):
+        return True
+
+    def run(self):
         try:
-            if not self.__class__.__name__=="BackTest":
-                current = int(time.time())
-                wait = self._period - (current%self._period)
-                logging.info("sleep for %s seconds" % wait)
-                time.sleep(wait+2)
+            if not self.__class__.__name__ == "BackTester":
 
-                while self._steps < self._total_steps:
-                    sleeptime = self.__trade_body()
+                raise NotImplementedError()
+
+                current = int(time.time())
+                wait = self.waiting_period - (current % self.waiting_period)
+                logging.info("sleep for %s seconds" % wait)
+                time.sleep(wait + 2)
+
+                while self.current_epoch < self.end_epoch:
+                    sleeptime = self.trade_body()
                     time.sleep(sleeptime)
             else:
-                while self._steps < self._total_steps:
-                    self.__trade_body()
+                while self.current_epoch < self.end_epoch - self.step:
+                    if self.check_epoch_in_timetable(self.current_epoch):
+                        self.trade_body()
+                    self.current_epoch += self.step
         finally:
-            if self._agent_type=="nn":
-                self._agent.recycle()
             self.finish_trading()
-

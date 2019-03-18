@@ -21,7 +21,7 @@ class RmrAgent(Agent):
         self.last_portfolio = np.ones(self.n_inst) / self.n_inst
         self.weights_projection = agent_utils.WeightsProjection(config)
         timetable = agent_utils.ExchangeTimetable(self.config["exchange"])
-        self.data_extractor = agent_utils.DataExtractor(timetable, config,
+        self.data_extractor = agent_utils.DataExtractor(data_loader, timetable, config,
                                         config["window"] + 1, False)
 
     def rmr_next_weights(self, data_close):
@@ -35,9 +35,7 @@ class RmrAgent(Agent):
         weights = self.last_portfolio - alpha * (x_t1 - np.mean(x_t1))
         return self.weights_projection(weights)
 
-    def compute_portfolio(self):
-        #epoch = self.current_time()
-        epoch = 1552815785
+    def compute_portfolio(self, epoch):
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.rmr_next_weights(data_price_relatives)
         print("rmr weights:", day_weight)
