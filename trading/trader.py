@@ -10,7 +10,7 @@ class Trader:
         self.data_loader = data_loader
         self.agent = agent
         self.trade_log = trade_log
-        self.instruments_list = config["instruments_list"]
+        self.instruments_list = self.agent.instruments_list
         self.price_label = config["price_label"]
         self.relevant_columns = [
             ">".join([
@@ -19,12 +19,12 @@ class Trader:
                 config["candles_res"],
                 self.price_label
             ])
-            for label in config["instruments_list"]
+            for label in self.instruments_list
         ]
         self.steps = 0
         self.total_capital = initial_capital
         self.waiting_period = waiting_period
-        self.coin_number = len(config["instruments_list"])
+        self.coin_number = len(self.instruments_list)
         self.commission_rate = config["fee"]
         self.asset_vector = np.zeros(self.coin_number + 1)
         self.last_weights = np.zeros((self.coin_number + 1,))

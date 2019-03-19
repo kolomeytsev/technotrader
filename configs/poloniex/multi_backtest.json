@@ -1,0 +1,20 @@
+{
+    "agents": ["rmr", "olmar1", "olmar2"],
+    "configs": [
+        "configs/poloniex/rmr.json",
+        "configs/poloniex/olmar1.json",
+        "configs/poloniex/olmar2.json"
+    ],
+    "instruments_list": [
+        "ETH/BTC",
+        "XRP/BTC",
+        "EOS/BTC",
+        "LTC/BTC",
+        "ARDR/BTC",
+        "DASH/BTC",
+        "XMR/BTC",
+        "ETC/BTC",
+        "BAT/BTC",
+        "ZEC/BTC"
+    ]
+}

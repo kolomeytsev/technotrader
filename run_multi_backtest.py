@@ -6,6 +6,10 @@ import logging
 import argparse
 import datetime
 import pytz
+import numpy as np
+import pandas as pd
+import multiprocessing
+from multiprocessing import Pool
 from technotrader.trading.backtester import BackTester
 from technotrader.data.data_loader import DataLoader
 from technotrader.constants import *
@@ -39,14 +43,17 @@ def parse_parameters():
                         help='dump frequency fee (default=1)')
     parser.add_argument('--short', action='store_const', 
                         const=True, default=False,
-                        help='using short (T/F)')
+                        help='using short (True/False)')
+    parser.add_argument('--parallel', action='store_const', 
+                        const=True, default=False,
+                        help='parallel computing (True/False)')
     args = parser.parse_args()
     return args
 
 
-def get_agent_class(agent_name):
-    if AGENTS.get(agent_name) is not None:
-        class_name, from_file = AGENTS[agent_name]
+def get_agent_class(agent_class):
+    if AGENTS.get(agent_class) is not None:
+        class_name, from_file = AGENTS[agent_class]
         agent_class = getattr(importlib.import_module(from_file), class_name)
     else:
         print("Agent is not available")
@@ -54,12 +61,13 @@ def get_agent_class(agent_name):
     return agent_class
 
 
-def fill_agent_config(config, args):
+def fill_agent_config(config, args, agent_class):
     if args.step is not None:
         step = args.step
     else:
         step = RESOLUTIONS[args.candles_res]
-    config["agent_name"] = args.agent
+    config["agent_class"] = agent_class
+    config["agent_name"] = agent_class
     config["begin"] = convert_time(args.begin)
     config["candles_res"] = args.candles_res
     config["step"] = step
@@ -67,13 +75,12 @@ def fill_agent_config(config, args):
     config["short_flag"] = args.short
 
 
-def get_agent(args, agent_config, data_loader, backtest_config=None):    
-    Agent = get_agent_class(args.agent)
-    agent_name = args.agent
+def get_agent(args, agent_class, agent_config, data_loader, backtest_config=None):    
+    Agent = get_agent_class(agent_class)
     if backtest_config is not None:
         if "instruments_list" in backtest_config:
             agent_config["instruments_list"] = backtest_config["instruments_list"]
-    fill_agent_config(agent_config, args)
+    fill_agent_config(agent_config, args, agent_class)
     print("agent_config:")
     print(agent_config)
     agent = Agent(agent_config, data_loader)
@@ -87,7 +94,8 @@ def get_time_as_name_string(start, end):
 
 
 def convert_time(time_str):
-    dt = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+    dt = datetime.datetime.strptime(
+            time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
     return int(dt.timestamp())
 
 
@@ -124,33 +132,91 @@ def generate_backtest_config(args):
         "exchange": args.exchange,
         "candles_res": args.candles_res,
         "price_label": "close",
-        "log_frequency": 1,
-        "dump_path": args.path,
-        "dump_freq": args.freq
+        "log_frequency": 1
     }
     return config
 
 
+def read_multi_backtest_configs(args, multi_agent_config):
+    """
+    There can be 2 options:
+    1) if instruments_list is in multi_backtest.json config
+    then all backtests are tested with these instruments
+    2) if not then use instruments from each agent's config
+    (so there can be backtests using different instruments)
+    """
+    agent_configs = []
+    if multi_agent_config.get("instruments_list") is not None:
+        all_instruments = multi_agent_config["instruments_list"]
+    else:
+        all_instruments = set()
+    for agent_class, configs_path in zip(multi_agent_config["agents"],
+                                        multi_agent_config["configs"]):
+        with open(configs_path) as f:
+            agent_config = json.load(f)
+        if multi_agent_config.get("instruments_list") is not None:
+            agent_config["instruments_list"] = all_instruments
+        else:
+            all_instruments.union(agent_config["instruments_list"])
+        agent_configs.append((agent_class, agent_config))
+    return agent_configs, list(all_instruments)
+
+
 def read_configs(args):
+    data_config = generate_data_config(args)
     with open(args.config) as f:
         agent_config = json.load(f)
-    data_config = generate_data_config(args)
     backtest_config = generate_backtest_config(args)
-    data_config["instruments_list"] = agent_config["instruments_list"]
-    backtest_config["instruments_list"] = agent_config["instruments_list"]
-    return data_config, agent_config, backtest_config
+    if args.agent is None:
+        agent_configs, all_instruments = read_multi_backtest_configs(
+                                            args, agent_config)
+    else:
+        agent_configs = [(args.agent, agent_config)]
+        all_instruments = agent_config["instruments_list"]
+    data_config["instruments_list"] = all_instruments
+    return data_config, agent_configs, backtest_config
+
+
+def save_results(backtesters_results, path):
+    print("saving results")
+    results = {}
+    for agent_name, test_pc_vector_no_fee, test_pc_vector in backtesters_results:
+        results[agent_name + "_returns_no_fee"] = test_pc_vector_no_fee
+        results[agent_name + "_returns_with_fee"] = test_pc_vector
+    df = pd.DataFrame.from_dict(results)
+    df.to_csv(path, index=False)
+
+
+def run_backtest(backtester):
+    backtester.run()
+    results = (
+        backtester.agent.config["agent_name"],
+        backtester.test_pc_vector_no_fee,
+        backtester.test_pc_vector
+    )
+    return results
+
+
+def run_multi_backtest(args, data_config, agent_configs, backtest_config):
+    data_loader = DataLoader(data_config)
+    backtesters_list = []
+    for agent_class, agent_config in agent_configs:
+        agent = get_agent(args, agent_class, agent_config, data_loader, backtest_config)
+        backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
+        backtesters_list.append(backtester)
+    if args.parallel:
+        pool = Pool(multiprocessing.cpu_count() - 1)
+        results = pool.map(run_backtest, backtesters_list)
+    else:
+        results = list(map(run_backtest, backtesters_list))
+    save_results(results, args.path)
 
 
 def main():
     args = parse_parameters()
-    data_config, agent_config, backtest_config = read_configs(args)
-    print("data config:", data_config)
-    print("agent config:", agent_config)
-    print("backtest config:", backtest_config)
-    data_loader = DataLoader(data_config)
-    agent = get_agent(args, agent_config, data_loader, backtest_config)
-    backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
-    backtester.run()
+    data_config, agent_configs, backtest_config = read_configs(args)
+    print("data_config", data_config)    
+    run_multi_backtest(args, data_config, agent_configs, backtest_config)
 
 
 if __name__ == '__main__':
