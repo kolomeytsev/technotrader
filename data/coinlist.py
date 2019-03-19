@@ -1,12 +1,23 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
-from pgportfolio.marketdata.poloniex import Poloniex
-from pgportfolio.tools.data import get_chart_until_success
+from technotrader.data.poloniex import Poloniex
 import pandas as pd
 from datetime import datetime
 import logging
-from pgportfolio.constants import *
+from technotrader.trading.constants import *
+
+
+def get_chart_until_success(polo, pair, start, period, end):
+    is_connect_success = False
+    chart = {}
+    while not is_connect_success:
+        try:
+            chart = polo.marketChart(pair=pair, start=int(start), period=int(period), end=int(end))
+            is_connect_success = True
+        except Exception as e:
+            print(e)
+    return chart
 
 
 class CoinList(object):

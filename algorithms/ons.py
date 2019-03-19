@@ -14,9 +14,6 @@ class OnsAgent(Agent):
     """
     def __init__(self, config, data_loader, trade_log=None):
         super().__init__(config, data_loader)
-        self.opt = __import__('cvxopt', fromlist=['opt'])
-        self.optsolvers = __import__('cvxopt.solvers', fromlist=[None])
-        self.optsolvers.options['show_progress'] = False
         self.instruments_list = config["instruments_list"]
         self.eta = config['mixture']
         self.beta = config['tradeoff']

@@ -1,14 +1,6 @@
 from os import path
 
-
-DATABASE_DIR = path.realpath(__file__).\
-    replace('technotrader/constants.pyc','technotrader/database/Data.db').\
-    replace("technotrader\\constants.pyc","technotrader/database\\Data.db").\
-    replace('technotrader/constants.py','technotrader/database/Data.db').\
-    replace("technotrader\\constants.py","technotrader/database\\Data.db")
-CONFIG_FILE_DIR = "net_config.json"
-LAMBDA = 1e-4  # lambda in loss function 5 in training
-
+DATABASE_DIR = "database/Data.db"
 
 NOW = 0
 FIVE_MINUTES = 60 * 5
@@ -22,8 +14,6 @@ TEN_HOUR = HOUR * 10
 TWELVE_HOUR = HOUR * 12
 DAY = HOUR * 24
 YEAR = DAY * 365
-   # trading table name
-TABLE_NAME = 'test'
 
 
 RESOLUTIONS = {
@@ -68,7 +58,8 @@ AGENTS = {
     'trend_follow': ('TrendFollowAgent', 'algorithms.trend_follow'),
     'hmm_trend_follow': ('HmmTrendFollowAgent', 'algorithms.hmm_trend_follow'),
     'bollinger': ('BollingerAgent', 'algorithms.bollinger'),
-    'meta': ('MetaEgOnsAgent', 'algorithms.meta_eg_ons'),
+    'meta_eg': ('MetaEgOnsAgent', 'algorithms.meta_eg_ons'),
+    'meta_ons': ('MetaEgOnsAgent', 'algorithms.meta_eg_ons'),
     'markowitz': ('MarkowitzAgent', 'algorithms.markowitz'),
     'min_variance': ('MinVarianceAgent', 'algorithms.min_variance'),
     'max_sharpe': ('MaxSharpeAgent', 'algorithms.max_sharpe'),
@@ -76,4 +67,13 @@ AGENTS = {
     'rrl': ('RrlAgent', 'rrl.rrl_agent'),
     'sspo': ('SspoAgent', 'algorithms.sspo'),
     'ppt': ('PptAgent', 'algorithms.ppt')
+}
+
+
+LIST_PARAMS = ["instruments_list", "price_label"]
+
+
+LIST_PARAMS_DICT = {
+    "bmar2": ["alphas"],
+    "rl": ["layers"]
 }

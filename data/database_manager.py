@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from technotrader.constants import *
+from technotrader.trading.constants import *
 import sqlite3
 from datetime import datetime
 import logging

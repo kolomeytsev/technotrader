@@ -2,10 +2,11 @@
     "agents": [
         "rmr", "olmar1", "olmar2", "bmar1", "bmar2",
         "anticor", "anticor_anticor", "bah_anticor",
-        "corn", "crp", "eg", "sspo", "ppt", "ons",
-        "cwmr_var", "cwmr_std", "meta_eg", "meta_ons",
-        "trend_follow", "bollinger",
-        "arma", "arima", "cfr_ogd", "cfr_ons"
+        "corn", "crp", "eg",
+        "sspo", "ppt", "ons",
+        "cwmr_var", "cwmr_std",
+        "trend_follow", "bollinger", "meta",
+        "meta"
     ],
     "configs": [
         "configs/poloniex/rmr.json",
@@ -24,14 +25,10 @@
         "configs/poloniex/ons.json",
         "configs/poloniex/cwmr.json",
         "configs/poloniex/cwmr.json",
-        "configs/poloniex/meta_eg.json",
-        "configs/poloniex/meta_ons.json",
         "configs/poloniex/trend_follow.json",
         "configs/poloniex/bollinger.json",
-        "configs/poloniex/arma.json",
-        "configs/poloniex/arima.json",
-        "configs/poloniex/cfr_ogd.json",
-        "configs/poloniex/cfr_ons.json"
+        "configs/poloniex/meta_eg.json",
+        "configs/poloniex/meta_ons.json"
     ],
     "instruments_list": [
         "ETH/BTC",
