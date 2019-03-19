@@ -34,19 +34,21 @@ AGENTS = {
     'anticor': ('AnticorAgent', 'algorithms.anticor'),
     'bah_anticor': ('BahAnticorAgent', 'algorithms.bah_anticor'),
     'anticor_anticor': ('AnticorAnticorAgent', 'algorithms.anticor_anticor'),
+    'bmar1': ('Bmar1Agent', 'algorithms.bmar1'),
+    'bmar2': ('Bmar2Agent', 'algorithms.bmar2'),
     'olmar1': ('Olmar1Agent', 'algorithms.olmar1'),
     'olmar2': ('Olmar2Agent', 'algorithms.olmar2'),
     'rmr': ('RmrAgent', 'algorithms.rmr'),
+    'rmr_trend_follow': ('RmrTrendFollowAgent', 'algorithms.rmr_trend_follow'),
     'pamr': ('PamrAgent', 'algorithms.pamr'),
     'wmamr': ('WmamrAgent', 'algorithms.wmamr'),
     'cwmr_var': ('CwmrVarAgent', 'algorithms.cwmr_var'),
     'cwmr_std': ('CwmrStdAgent', 'algorithms.cwmr_std'),
     'corn': ('CornAgent', 'algorithms.corn'),
     'bnn': ('BnnAgent', 'algorithms.bnn'),
-    'cfr_ogd': ('CfrOgd', 'algorithms.cfr_ogd'),
-    'cfr_ons': ('CfrOns', 'algorithms.cfr_ons'),
+    'cfr_ogd': ('CfrOgdAgent', 'algorithms.cfr_ogd'),
+    'cfr_ons': ('CfrOnsAgent', 'algorithms.cfr_ons'),
     'rl': ('RLAgent', 'rllib.rl_agent'),
-    'ftl_cor': ('FTLCor', 'algorithms.ftl_cor'),
     'arma': ('ArmaAgent', 'algorithms.arma'),
     'arima': ('ArimaAgent', 'algorithms.arima'),
     'trend_follow': ('TrendFollowAgent', 'algorithms.trend_follow'),
@@ -57,7 +59,9 @@ AGENTS = {
     'min_variance': ('MinVarianceAgent', 'algorithms.min_variance'),
     'max_sharpe': ('MaxSharpeAgent', 'algorithms.max_sharpe'),
     'max_return': ('MaxReturnAgent', 'algorithms.max_return'),
-    'rrl': ('RrlAgent', 'rrl.rrl_agent')
+    'rrl': ('RrlAgent', 'rrl.rrl_agent'),
+    'sspo': ('SspoAgent', 'algorithms.sspo'),
+    'ppt': ('PptAgent', 'algorithms.ppt')
 }
 
 

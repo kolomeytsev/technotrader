@@ -4,46 +4,44 @@ from technotrader.trading.agent import Agent
 import technotrader.utils.agent_utils as agent_utils
 
 
-class RmrAgent(Agent):
+class Olmar2Agent(Agent):
     """
-    Robust Median Reversion strategy (Huang et al. [2013]).
-    Link:
-    https://www.ijcai.org/Proceedings/13/Papers/296.pdf
+    On-Line Moving Average Reversion strategy (Li and Hoi [2012]). Variant 2.
     """
     def __init__(self, config, data_loader, trade_log=None):
         super().__init__(config, data_loader)
         self.instruments_list = config["instruments_list"]
+        self.alpha = config["alpha"]
         self.epsilon = config["epsilon"]
         use_risk_free = config["use_risk_free"]
         self.n_inst = len(self.instruments_list)
         if use_risk_free:
             self.n_inst += 1
         self.last_portfolio = np.ones(self.n_inst) / self.n_inst
+        self.data_phi = np.zeros(self.n_inst)
         self.weights_projection = agent_utils.WeightsProjection(config)
         timetable = agent_utils.ExchangeTimetable(config["exchange"])
-        if config.get("price_relatives_flag") is not None:
-            price_relatives_flag = config["price_relatives_flag"]
-        else:
-            price_relatives_flag = False
         self.data_extractor = agent_utils.DataExtractor(data_loader, 
-                timetable, config, config["window"] + 1, price_relatives_flag)
+                                        timetable, config, 2, True)
 
-    def rmr_next_weights(self, data_close):
-        prices_median = agent_utils.compute_L1_median(data_close)
-        x_t1 = prices_median / data_close[-1]
-        denom = (np.linalg.norm(x_t1 - np.mean(x_t1))) ** 2
-        if denom == 0:
-            alpha = 0
+    def olmar2_next_weight(self, x):
+        self.data_phi = self.alpha + (1 - self.alpha) * self.data_phi / x
+        ell = max([0, self.epsilon - self.data_phi @ self.last_portfolio])
+        x_bar = np.mean(self.data_phi)
+        denom_part = self.data_phi - x_bar
+        denominator = np.dot(denom_part, denom_part)
+        if denominator != 0:
+            lmbd = ell / denominator
         else:
-            alpha = min(0, (np.dot(x_t1, self.last_portfolio) - self.epsilon) / denom)
-        weights = self.last_portfolio - alpha * (x_t1 - np.mean(x_t1))
+            lmbd = 0
+        weights = self.last_portfolio + lmbd * (self.data_phi - x_bar)
         return self.weights_projection(weights)
 
     def compute_portfolio(self, epoch):
-        data_prices = self.data_extractor(epoch)
-        day_weight = self.rmr_next_weights(data_prices)
-        print("rmr weights:", day_weight)
-        self.last_portfolio = day_weight.copy()
+        data_price_relatives = self.data_extractor(epoch)
+        day_weight = self.olmar2_next_weight(data_price_relatives.ravel())
+        print("olmar2:", day_weight)
+        self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
             preds_dict[instrument] = day_weight[i]
