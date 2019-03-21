@@ -1,6 +1,6 @@
 from os import path
 
-DATABASE_DIR = "database/Data.db"
+DATABASE_DIR = "/Users/kolomeytsev/olps/technotrader/database/Data.db"
 
 NOW = 0
 FIVE_MINUTES = 60 * 5

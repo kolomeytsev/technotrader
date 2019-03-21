@@ -1,0 +1,247 @@
+{
+    "olmar1": {   
+        "epsilon": 10,
+        "window": 5
+    },
+    "olmar2": {   
+        "epsilon": 10,
+        "alpha": 0.5
+    },
+    "bmar1": {
+        "max_window": 5,
+        "epsilon": 10.0,
+        "eta": 10
+    },
+    "bmar2": {
+        "alphas": [0.3, 0.5, 0.6],
+        "eta": 10,
+        "epsilon": 10.0
+    },
+    "anticor": {
+        "window": 5
+    },
+    "corn": {
+        "window": 4,
+        "correlation_threshold": 0.1,
+        "init_history_length": 0,
+        "history_start_date": null
+    },
+    "bnn": {
+        "nearest_neighbors": 10,
+        "sequence_length": 5
+    },
+    "crp": {
+        "weights": null
+    },
+
+    "eg": {
+        "learning_rate": 1,
+        "flag": false
+    },
+
+    "ons": {
+        "temperature": 1,
+        "mixture": 0,
+        "tradeoff": 1,
+        "heuristic_tuning": 0.125
+    },
+
+    "pamr": {
+        "mean_reversion_threshold": 0.5,
+        "aggressive_param": 500,
+        "variant": 0
+    },
+    "wmamr": {
+        "mean_reversion_threshold": 0.5,
+        "aggressive_param": 500,
+        "variant": 0,
+        "window": 5
+    },
+
+    "rmr": {
+        "epsilon": 10,
+        "window": 5,
+        "price_relatives_flag": false
+    },
+    "rmr_trend_follow": {
+        "epsilon": 10,
+        "window": 5,
+        "price_relatives_flag": true,
+        "down_trend_threshold": 13,
+        "window_long": 40,
+        "window_short": 20
+    },
+    "up": {
+        "temperature": null,
+        "flag": false
+    },
+    "cwmr": {
+        "epsilon": -0.5,
+        "confidence": 2
+    },
+    "arma": {
+        "epsilon": 10,
+        "window": 7,
+        "init_weights_denom": 30,
+        "lr": 100,
+        "ons_eps": 7,
+        "method": "ogd",
+        "lr_decrease_power": null 
+    },
+    "arima": {
+        "epsilon": 10,
+        "window": 5,
+        "init_weights_denom": 100000,
+        "lr": 2,
+        "ons_eps": 0.316,
+        "method": "ons",
+        "lr_decrease_power": null
+    },
+
+    "cfr_ogd": {
+        "epsilon": 10,
+        "window": 5,
+        "learning_rate": 0.02,
+        "estim_num": 4,
+        "config_arma": {
+            "window": 7,
+            "init_weights_denom": 35,
+            "lr": 7,
+            "ons_eps": 3.16e-06,
+            "method": "ons",
+            "lr_decrease_power": null
+        },
+        "config_arima": {
+            "window": 7,
+            "init_weights_denom": 100,
+            "lr": 0.57,
+            "ons_eps": 0.3,
+            "method": "ons",
+            "lr_decrease_power": null
+        }
+    }
+,
+
+    "cfr_ogd": {
+        "epsilon": 10,
+        "window": 5,
+        "learning_rate": 20,
+        "estim_num": 4,
+        "config_arma": {
+            "window": 7,
+            "init_weights_denom": 30,
+            "lr": 100,
+            "ons_eps": 7,
+            "method": "ogd",
+            "lr_decrease_power": null 
+        },
+        "config_arima": {
+            "window": 7,
+            "init_weights_denom": 1000,
+            "lr": 0.57,
+            "ons_eps": 0.3,
+            "method": "ons",
+            "lr_decrease_power": null
+        }
+    },
+    "cfr_ons": {
+        "epsilon": 10,
+        "window": 5,
+        "learning_rate": 1.75,
+        "estim_num": 4,
+        "ons_eps": 0.3,
+        "config_arma": {
+            "window": 7,
+            "init_weights_denom": 30,
+            "lr": 100,
+            "ons_eps": 7,
+            "method": "ogd",
+            "lr_decrease_power": null 
+        },
+        "config_arima": {
+            "window": 7,
+            "init_weights_denom": 1000,
+            "lr": 0.57,
+            "ons_eps": 0.3,
+            "method": "ons",
+            "lr_decrease_power": null
+        }
+    },
+    "trend_follow": {
+        "window_long": 10,
+        "window_short": 5,
+        "portion": 1,
+        "variant": 0,
+        "sort_method": 2,
+        "sort_threshold": 60,
+        "min_hold_periods": 0
+    },
+    "meta_eg": {
+        "learning_rate": 10,
+        "mixture": 0,
+        "tradeoff": 1,
+        "heuristic_tuning": 0.125,
+        "window": 10,
+        "update_method": "eg",
+        "meta_update_parameter": 100
+    },
+
+    "meta_ons": {
+        "learning_rate": 10,
+        "mixture": 0,
+        "tradeoff": 1,
+        "heuristic_tuning": 0.125,
+        "window": 10,
+        "update_method": "ons",
+        "meta_update_parameter": 100,
+        "meta_epsilon": 1
+    },
+    "markowitz": {
+        "fit_frequency": 1,
+        "fit_window": 10,
+        "rebalance_frequency": 1,
+        "min_return_level": 0.95,
+        "allow_short": false
+    },
+    "min_variance": {
+        "fit_frequency": 1,
+        "fit_window": 10,
+        "rebalance_frequency": 1,
+        "allow_short": false
+    },
+
+    "max_sharpe": {
+        "fit_frequency": 1,
+        "fit_window": 10,
+        "rebalance_frequency": 1,
+        "allow_short": false
+    },
+
+    "max_return": {
+        "fit_frequency": 1,
+        "fit_window": 2,
+        "rebalance_frequency": 1
+    },
+    "bollinger": {
+        "window": 20,
+        "std_coef_open": 1.5,
+        "std_coef_close": 0.5,
+        "portion": 0.5,
+        "allow_short": false
+    },
+
+    "sspo": {
+        "max_iter": 1e4,
+        "abstol": 1e-4,
+        "zeta": 500,
+        "lmbd": 0.5,
+        "gamma": 0.01,
+        "eta": 0.005,
+        "window": 5
+    },
+
+    "ppt": {
+        "epsilon": 10,
+        "window": 5
+    }
+}
