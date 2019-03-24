@@ -15,6 +15,18 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
@@ -78,6 +90,18 @@
         <string>Run Backtest</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QGroupBox" name="groupBoxAgentsParameters">
           <property name="enabled">
@@ -94,6 +118,11 @@
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <widget class="QLabel" name="labelChooseAgent">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Choose Agent:</string>
              </property>
@@ -114,6 +143,18 @@
               <string>Main Parameters</string>
              </property>
              <layout class="QGridLayout" name="gridLayout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item row="0" column="0">
                <widget class="QTableWidget" name="tableWidgetMainParameters">
                 <attribute name="horizontalHeaderDefaultSectionSize">
@@ -170,7 +211,7 @@
               <string>Other Parameters</string>
              </property>
              <layout class="QFormLayout" name="formLayout_2">
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="labelPriceLabel">
                 <property name="font">
                  <font>
@@ -182,7 +223,17 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="1" column="1">
+               <widget class="QComboBox" name="comboBoxPriceLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>150</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
                <widget class="QLabel" name="labelUseRiskFree">
                 <property name="font">
                  <font>
@@ -194,7 +245,17 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="checkBoxUseRiskFree">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
                <widget class="QLabel" name="labelUseShorts">
                 <property name="font">
                  <font>
@@ -206,7 +267,14 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="checkBoxUseShorts">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
                <widget class="QLabel" name="labelUseNeutralization">
                 <property name="font">
                  <font>
@@ -218,7 +286,14 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="4" column="1">
+               <widget class="QCheckBox" name="checkUseNeutralization">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
                <widget class="QLabel" name="labelProjectMethod">
                 <property name="font">
                  <font>
@@ -230,7 +305,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QComboBox" name="comboBoxProjectMethod">
                 <property name="minimumSize">
                  <size>
@@ -240,7 +315,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="labelTopAmount">
                 <property name="font">
                  <font>
@@ -252,7 +327,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QSpinBox" name="spinBoxTopAmount">
                 <property name="minimumSize">
                  <size>
@@ -268,39 +343,20 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
-               <widget class="QCheckBox" name="checkUseNeutralization">
-                <property name="text">
-                 <string/>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelAgentsName">
+                <property name="font">
+                 <font>
+                  <pointsize>15</pointsize>
+                 </font>
                 </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QCheckBox" name="checkBoxUseShorts">
                 <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QCheckBox" name="checkBoxUseRiskFree">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
+                 <string>Agent's Name</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxPriceLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>150</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
+               <widget class="QLineEdit" name="lineEditAgentsName"/>
               </item>
              </layout>
             </widget>
@@ -323,6 +379,12 @@
         </item>
         <item>
          <widget class="QGroupBox" name="groupBoxAddedAgents">
+          <property name="minimumSize">
+           <size>
+            <width>450</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>15</pointsize>
@@ -331,49 +393,71 @@
           <property name="title">
            <string>Added Agents</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QScrollArea" name="scrollArea_2">
-             <property name="maximumSize">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupBoxAddedActions">
+             <property name="minimumSize">
               <size>
-               <width>16777215</width>
-               <height>16777215</height>
+               <width>0</width>
+               <height>50</height>
               </size>
              </property>
-             <property name="widgetResizable">
-              <bool>true</bool>
+             <property name="title">
+              <string/>
              </property>
-             <widget class="QWidget" name="scrollAreaWidgetContents_2">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>348</width>
-                <height>643</height>
-               </rect>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QPushButton" name="pushButtonAddedEdit">
+                <property name="text">
+                 <string>Edit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonAddedDelete">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QTableWidget" name="tableWidgetAddedAgents">
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>100</number>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>30</number>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Agent</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <item>
-                <widget class="QTableWidget" name="tableWidgetAddedAgents">
-                 <column>
-                  <property name="text">
-                   <string>Agent</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Parameters</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Action</string>
-                  </property>
-                 </column>
-                </widget>
-               </item>
-              </layout>
-             </widget>
+             </column>
+             <column>
+              <property name="text">
+               <string>Main Parameters</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Other Parameters</string>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -390,13 +474,6 @@
            <string>Backtest's Parameters</string>
           </property>
           <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelDataset">
-             <property name="text">
-              <string>Exchange or Dataset:</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="comboBoxDataset">
              <property name="minimumSize">
@@ -420,7 +497,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QTextEdit" name="textEdit">
+            <widget class="QTextEdit" name="textEditInstruments">
              <property name="maximumSize">
               <size>
                <width>190</width>
@@ -431,8 +508,13 @@
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="labelCandlesResolution">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Candles Resolution:</string>
+              <string> Resolution:</string>
              </property>
             </widget>
            </item>
@@ -446,17 +528,22 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="labelStep">
-             <property name="text">
-              <string>Step:</string>
+           <item row="3" column="1">
+            <widget class="QSpinBox" name="spinBoxStep">
+             <property name="maximum">
+              <number>16777215</number>
              </property>
             </widget>
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="labelFee">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Transaction Cost (%)</string>
+              <string>Fee (%):</string>
              </property>
             </widget>
            </item>
@@ -472,8 +559,13 @@
            </item>
            <item row="5" column="0">
             <widget class="QLabel" name="labelDumpPath">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Path to Dump Results:</string>
+              <string>Path for Results:</string>
              </property>
             </widget>
            </item>
@@ -511,8 +603,13 @@
            </item>
            <item row="7" column="0">
             <widget class="QLabel" name="labelDataStart">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Data Start Time:</string>
+              <string>Data Start:</string>
              </property>
             </widget>
            </item>
@@ -520,19 +617,19 @@
             <widget class="QDateTimeEdit" name="dateTimeEditDataStart">
              <property name="minimumSize">
               <size>
-               <width>170</width>
+               <width>180</width>
                <height>0</height>
               </size>
              </property>
              <property name="date">
               <date>
                <year>2019</year>
-               <month>3</month>
-               <day>1</day>
+               <month>2</month>
+               <day>24</day>
               </date>
              </property>
              <property name="displayFormat">
-              <string>yyyy.MM.dd HH:mm:ss</string>
+              <string>yyyy-MM-dd HH:mm:ss</string>
              </property>
              <property name="timeSpec">
               <enum>Qt::UTC</enum>
@@ -541,8 +638,13 @@
            </item>
            <item row="8" column="0">
             <widget class="QLabel" name="labelBacktestStart">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Backtest Start Time:</string>
+              <string>Backtest Start:</string>
              </property>
             </widget>
            </item>
@@ -550,19 +652,19 @@
             <widget class="QDateTimeEdit" name="dateTimeEditBacktestStart">
              <property name="minimumSize">
               <size>
-               <width>170</width>
+               <width>180</width>
                <height>0</height>
               </size>
              </property>
              <property name="date">
               <date>
                <year>2019</year>
-               <month>3</month>
-               <day>1</day>
+               <month>2</month>
+               <day>24</day>
               </date>
              </property>
              <property name="displayFormat">
-              <string>yyyy.MM.dd HH:mm:ss</string>
+              <string>yyyy-MM-dd HH:mm:ss</string>
              </property>
              <property name="timeSpec">
               <enum>Qt::UTC</enum>
@@ -571,8 +673,13 @@
            </item>
            <item row="9" column="0">
             <widget class="QLabel" name="labelBacktestEnd">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Backtest End Time:</string>
+              <string>Backtest End:</string>
              </property>
             </widget>
            </item>
@@ -580,26 +687,26 @@
             <widget class="QDateTimeEdit" name="dateTimeEditBacktestEnd">
              <property name="minimumSize">
               <size>
-               <width>170</width>
+               <width>180</width>
                <height>0</height>
               </size>
              </property>
              <property name="date">
               <date>
                <year>2019</year>
-               <month>3</month>
-               <day>1</day>
+               <month>2</month>
+               <day>24</day>
               </date>
              </property>
              <property name="displayFormat">
-              <string>yyyy.MM.dd HH:mm:ss</string>
+              <string>yyyy-MM-dd HH:mm:ss</string>
              </property>
              <property name="timeSpec">
               <enum>Qt::UTC</enum>
              </property>
             </widget>
            </item>
-           <item row="10" column="0" colspan="2">
+           <item row="11" column="0" colspan="2">
             <widget class="QPushButton" name="pushButtonRunBacktest">
              <property name="minimumSize">
               <size>
@@ -612,10 +719,27 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QSpinBox" name="spinBoxStep">
-             <property name="maximum">
-              <number>16777215</number>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelDataset">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Exchange or Dataset:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelStep">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Step:</string>
              </property>
             </widget>
            </item>

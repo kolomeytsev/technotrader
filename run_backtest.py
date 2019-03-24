@@ -68,19 +68,19 @@ def fill_agent_config(config, args, agent_class):
         step = args.step
     else:
         step = RESOLUTIONS[args.candles_res]
-    config["begin"] = convert_time(args.begin)
     config["candles_res"] = args.candles_res
     config["step"] = step
     config["exchange"] = args.exchange
     config["short_flag"] = args.short
 
 
-def get_agent(args, agent_class, agent_config, data_loader, backtest_config=None):    
+def get_agent(agent_class, agent_config, data_loader, args=None, backtest_config=None):    
     Agent = get_agent_class(agent_class)
     if backtest_config is not None:
         if "instruments_list" in backtest_config:
             agent_config["instruments_list"] = backtest_config["instruments_list"]
-    fill_agent_config(agent_config, args, agent_class)
+    if args is not None:
+        fill_agent_config(agent_config, args, agent_class)
     print("agent_config:")
     print(agent_config)
     agent = Agent(agent_config, data_loader)
@@ -267,26 +267,30 @@ def run_backtest(backtester):
     return results
 
 
-def run_multi_backtest(args, data_config, agent_configs, backtest_config):
+def run_multi_backtest(data_config, agent_configs, backtest_config,
+                        args=None, path=None, parallel=False):
     data_loader = DataLoader(data_config)
     backtesters_list = []
     for agent_class, agent_config in agent_configs:
-        agent = get_agent(args, agent_class, agent_config, data_loader, backtest_config)
+        agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
         backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
         backtesters_list.append(backtester)
-    if args.parallel:
+    if parallel:
         pool = Pool(multiprocessing.cpu_count() - 1)
         results = pool.map(run_backtest, backtesters_list)
     else:
         results = list(map(run_backtest, backtesters_list))
-    save_results(results, args.path)
+    if path is not None:
+        save_results(results, path)
+    return results
 
 
 def main():
     args = parse_parameters()
     data_config, agent_configs, backtest_config = read_configs(args)
     print("data_config", data_config)    
-    run_multi_backtest(args, data_config, agent_configs, backtest_config)
+    run_multi_backtest(data_config, agent_configs, backtest_config,
+                        args, args.path, args.parallel)
 
 
 if __name__ == '__main__':
