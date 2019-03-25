@@ -26,6 +26,9 @@ class BackTester(Trader):
         super().__init__(config, data_loader, agent, trade_log)
         self.test_pc_vector = []
         self.test_pc_vector_no_fee = []
+        self.test_turnover_vector = []
+        self.last_weights_raw = np.zeros((self.coin_number + 1,))
+        self.last_weights_raw[-1] = 1.0
         self.log_frequency = config["log_frequency"]
         if config.get("dump_path") is not None:
             self.dump_path = config["dump_path"]
@@ -39,7 +42,8 @@ class BackTester(Trader):
     def save_results(self):
         df = pd.DataFrame.from_dict({
             "returns_no_fee": self.test_pc_vector_no_fee,
-            "returns_with_fee": self.test_pc_vector
+            "returns_with_fee": self.test_pc_vector,
+            "turnover": self.test_turnover_vector
         })
         df.to_csv(self.dump_path, index=False)
 
@@ -69,16 +73,19 @@ class BackTester(Trader):
             self.last_weights,
             self.commission_rate
         )
+        turnover = np.abs(weights - self.last_weights_raw).sum()
         portfolio_change_no_fee = np.dot(weights, future_price_relatives)
         portfolio_change = portfolio_change_no_fee * pv_after_commission
         self.total_capital *= portfolio_change
         self.last_weights = pv_after_commission * weights * \
                            future_price_relatives / \
                            portfolio_change
+        self.last_weights_raw = weights.copy()
         logging.debug(
             "the portfolio change this period is : {}".format(portfolio_change)
         )
         self.test_pc_vector.append(portfolio_change)
         self.test_pc_vector_no_fee.append(portfolio_change_no_fee)
+        self.test_turnover_vector.append(turnover)
         if self.dump_path is not None and self.step % self.dump_freq == 0:
             self.save_results()

@@ -105,5 +105,6 @@ ENV/
 *.csv
 
 database/
+backtest_results/
 
 .DS_Store

@@ -77,3 +77,10 @@ LIST_PARAMS_DICT = {
     "bmar2": ["alphas"],
     "rl": ["layers"]
 }
+
+TRADING_DAYS_NUMBER = {
+    "poloniex": 365,
+    "binance": 365,
+    "moex": 253,
+    "nyse": 253
+}

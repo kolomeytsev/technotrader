@@ -1,12 +1,16 @@
 import sys
+sys.path.insert(0,'../../')
 import numpy as np
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
-from backtest_results_window import Ui_FormPlot
+import datetime
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
+from technotrader.gui.backtest_results_window import Ui_FormPlot
+from technotrader.utils.metrics import *
+from technotrader.trading.constants import *
 
 
 class WindowRunningBacktest(QtWidgets.QDialog):
@@ -58,19 +62,28 @@ class WindowRunningBacktest(QtWidgets.QDialog):
 
 
 class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
-    def __init__(self, df, agents_names):
+    def __init__(self, agents_names, results):
         super(BacktestResultsWindow, self).__init__()
+        self.agents_results = results["agents"]
+        self.data_config = results["data_config"]
+        self.backtest_config = results["backtest_config"]
         self.setupUi(self)
         self.resize(1300, 850)
-        self.df = df
         self.agents_names = agents_names
-        self.plot_types = ["cumulative sum", "cumulative product", "returns"]
-        self.legend_positions = ["bottom", "right", "no"]
+        self.plot_types = ["cumulative product", "cumulative sum", "returns"]
+        self.legend_positions = ["right", "bottom", "no"]
         self.initialize_combo_boxes()
         self.initialize_plot()
-        self.compute_metrics()
+        self.metrics_columns = [
+            "agent", "final_return_sum", "final_return_prod",
+            "apy", "sharpe", "mdd", "turnover", "volatility"
+        ]
+        self.tableWidgetMetrics.setSortingEnabled(True)
+        self.metrics_columns_mapping = {name: i for i, name in enumerate(self.metrics_columns)}
+        self.display_agents_metrics()
         self.plot()
         self.pushButtonPlot.clicked.connect(self.plot)
+        self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
 
     def initialize_plot(self):
         self.figure = plt.figure()
@@ -108,39 +121,60 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.comboBoxLegend.addItems(self.legend_positions)
         self.comboBoxLegend.activated[str].connect(self.choose_legend_position)
 
-    def compute_metrics(self):
-        self.metrics = {}
-        for agent in self.agents_names:
-            data = self.df[agent + "_returns_no_fee"].values
-            final_return = np.cumsum(data - 1)[-1] + 1
-            volatility = np.std(data)
-            sharpe = np.mean(data) / volatility
-            number_of_days = 30
-            trading_days = 365
-            apy = final_return**(trading_days / number_of_days) - 1
-            self.metrics[agent] = {
-                "final_return": final_return,
-                "sharpe": sharpe,
-                "volatility": volatility,
-                "apy": apy
-            }
-            numRows = self.tableWidgetMetrics.rowCount()
-            self.tableWidgetMetrics.insertRow(numRows)
-            agent_widget = QtWidgets.QLabel()
-            agent_widget.setText(agent)
-            final_return_widget = QtWidgets.QLabel()
-            final_return_widget.setText(str(final_return))
-            sharpe_widget = QtWidgets.QLabel()
-            sharpe_widget.setText(str(sharpe))
-            volatility_widget = QtWidgets.QLabel()
-            volatility_widget.setText(str(volatility))
-            apy_widget = QtWidgets.QLabel()
-            apy_widget.setText(str(apy))
-            self.tableWidgetMetrics.setCellWidget(numRows, 0, agent_widget)
-            self.tableWidgetMetrics.setCellWidget(numRows, 1, final_return_widget)
-            self.tableWidgetMetrics.setCellWidget(numRows, 2, sharpe_widget)
-            self.tableWidgetMetrics.setCellWidget(numRows, 3, volatility_widget)
-            self.tableWidgetMetrics.setCellWidget(numRows, 4, apy_widget)
+    def get_number_of_trading_days(self):
+        date_start = datetime.datetime.utcfromtimestamp(self.backtest_config["begin"])
+        date_end = datetime.datetime.utcfromtimestamp(self.backtest_config["end"])
+        return (date_end - date_start).days
+
+    def compute_metrics(self, data):
+        final_return_sum = np.cumsum(data - 1)[-1] + 1
+        final_return_prod = np.cumprod(data)[-1]
+        volatility = np.std(data - 1)
+        sharpe = np.mean(data - 1) / volatility
+        mdd = compute_max_drawdown(data)
+        number_of_days = self.get_number_of_trading_days()
+        if TRADING_DAYS_NUMBER.get(self.data_config["exchange"]) is not None:
+            trading_days = TRADING_DAYS_NUMBER[self.data_config["exchange"]]
+        else:
+            trading_days = 253
+        power = trading_days / number_of_days
+        metrics =  {
+            "final_return_sum": final_return_sum,
+            "final_return_prod": final_return_prod,
+            "apy": final_return_prod**power - 1,
+            "sharpe": sharpe,
+            "mdd": mdd,
+            "volatility": volatility
+        }
+        return metrics
+
+    def display_computed_metrics(self, metrics, value_format="%.3f"):
+        numRows = self.tableWidgetMetrics.rowCount()
+        self.tableWidgetMetrics.insertRow(numRows)
+        for name, value in metrics.items():
+            widget = QtWidgets.QLabel()
+            if isinstance(value, str):
+                str_format = "%s"
+            else:
+                str_format = value_format
+            widget.setText(str_format % value)
+            index = self.metrics_columns_mapping[name]
+            self.tableWidgetMetrics.setCellWidget(numRows, index, widget)
+
+    def display_agents_metrics(self):
+        #self.metrics = {}
+        self.tableWidgetMetrics.setRowCount(0)
+        agents_to_plot = self.get_agents_to_plot()
+        fee = self.doubleSpinBoxPlotFee.value()
+        for agent in agents_to_plot:
+            turnover = np.array(self.agents_results[agent]["turnover"])
+            data = np.array(self.agents_results[agent]["returns_no_fee"]) - turnover * fee
+            metrics = self.compute_metrics(data)
+            #self.metrics[agent] = metrics
+            metrics["agent"] = agent
+            metrics["turnover"] = sum(turnover)
+            self.display_computed_metrics(metrics)
+        self.tableWidgetMetrics.sortItems(1)
 
     def choose_agents(self):
         agents_to_plot = self.comboBoxPlotAgents.currentText()
@@ -179,9 +213,20 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                     if self.actions_dict[agent].isChecked()
             ]
 
+    def get_cumulative_returns(self, returns):
+        if self.comboBoxPlotType.currentText() == "cumulative sum":
+            data = np.cumsum(returns - 1) + 1
+        elif self.comboBoxPlotType.currentText() == "cumulative product":
+            data = np.cumprod(returns)
+        elif self.comboBoxPlotType.currentText() == "returns":
+            data = returns_with_fee
+        else:
+            raise ValueError("Wrong comboBoxPlotType value")
+        return data
+
     def plot(self):
-        for agent, action in self.actions_dict.items():
-            print(agent, action.isChecked())           
+        #for agent, action in self.actions_dict.items():
+        #    print(agent, action.isChecked())           
         #layout = QtWidgets.QVBoxLayout()
         #layout.addWidget(self.canvas)
         #layout.addWidget(self.toolbar)
@@ -190,16 +235,20 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         ax = self.figure.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
         agents_to_plot = self.get_agents_to_plot()
+        fee = self.doubleSpinBoxPlotFee.value()
         for agent in agents_to_plot:
-            if self.comboBoxPlotType.currentText() == "cumulative sum":
-                data = np.cumsum(self.df[agent + "_returns_no_fee"].values - 1) + 1
-            elif self.comboBoxPlotType.currentText() == "cumulative product":
-                data = np.cumprod(self.df[agent + "_returns_no_fee"].values)
-            elif self.comboBoxPlotType.currentText() == "returns":
-                data = self.df[agent + "_returns_no_fee"].values
-            else:
-                raise ValueError("Wrong comboBoxPlotType value")
-            ax.plot(data, label=agent, linewidth=0.9)
+            turnover = np.array(self.agents_results[agent]["turnover"])
+            returns_with_fee = np.array(
+                self.agents_results[agent]["returns_no_fee"]) - turnover * fee
+            data = self.get_cumulative_returns(returns_with_fee)
+            line = ax.plot(data, label=agent, linewidth=0.9)
+            if self.checkBoxPlotWithNoFee.isChecked():
+                data = self.get_cumulative_returns(
+                    np.array(self.agents_results[agent]["returns_no_fee"])
+                )
+                ax.plot(data, label=agent + ", no fee", 
+                        linewidth=0.9, linestyle='--', c=line[0]._color)
+
         self.figure.tight_layout()
         self.plot_legend(ax)
         ax.grid(color='lightgray', linestyle='dashed')

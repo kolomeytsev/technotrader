@@ -247,14 +247,36 @@ def read_configs(args):
     return data_config, agent_configs, backtest_config
 
 
-def save_results(backtesters_results, path):
+def save_results_df(backtesters_results, path):
     print("saving results")
     results = {}
-    for agent_name, test_pc_vector_no_fee, test_pc_vector in backtesters_results:
+    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector \
+            in backtesters_results:
         results[agent_name + "_returns_no_fee"] = test_pc_vector_no_fee
         results[agent_name + "_returns_with_fee"] = test_pc_vector
+        results[agent_name + "_turnover"] = test_turnover_vector
     df = pd.DataFrame.from_dict(results)
     df.to_csv(path, index=False)
+
+
+def save_results(backtesters_results, data_config, agent_configs, backtest_config, path):
+    print("saving results")
+    results = {
+        "data_config": data_config,
+        "backtest_config": backtest_config,
+        "agents": {}
+    }
+    agent_configs_dict = dict(agent_configs)
+    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector \
+            in backtesters_results:
+        results["agents"][agent_name] = {}
+        results["agents"][agent_name]["returns_no_fee"] = list(test_pc_vector_no_fee)
+        results["agents"][agent_name]["returns_with_fee"] = list(test_pc_vector)
+        results["agents"][agent_name]["turnover"] = list(test_turnover_vector)
+        results["agents"][agent_name]["config"] = agent_configs_dict[agent_name]
+    with open(path, "w") as f:
+        json.dump(results, f)
+    return results
 
 
 def run_backtest(backtester):
@@ -262,7 +284,8 @@ def run_backtest(backtester):
     results = (
         backtester.agent.config["agent_name"],
         backtester.test_pc_vector_no_fee,
-        backtester.test_pc_vector
+        backtester.test_pc_vector,
+        backtester.test_turnover_vector
     )
     return results
 
@@ -281,7 +304,7 @@ def run_multi_backtest(data_config, agent_configs, backtest_config,
     else:
         results = list(map(run_backtest, backtesters_list))
     if path is not None:
-        save_results(results, path)
+        results = save_results(results, data_config, agent_configs, backtest_config, path)
     return results
 
 

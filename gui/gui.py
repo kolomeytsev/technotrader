@@ -1,16 +1,17 @@
+import os
 import sys
 sys.path.insert(0,'../../')
 from PyQt5 import QtCore, QtGui, QtWidgets
-from mainwindow import Ui_MainWindow
-from backtest_results_window import Ui_FormPlot
-from windows import WindowRunningBacktest, BacktestResultsWindow
-from available_parameters import *
 import datetime
 import time
 import pytz
 import json
 import qdarkstyle
 from technotrader.run_backtest import *
+from technotrader.gui.mainwindow import Ui_MainWindow
+from technotrader.gui.backtest_results_window import Ui_FormPlot
+from technotrader.gui.windows import WindowRunningBacktest, BacktestResultsWindow
+from technotrader.gui.available_parameters import *
 
 
 def get_time_as_name_string(start, end):
@@ -25,13 +26,33 @@ def convert_time(time_str):
     return int(dt.timestamp())
 
 
+def convert_time_to_str(timestamp):
+    dt = datetime.datetime.utcfromtimestamp(timestamp)
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 class TechnoTraderMainWindow(Ui_MainWindow):
     def __init__(self, MainWindow, app):
         self.app = app
         self.setupUi(MainWindow)
+        MainWindow.resize(1200, 800)
+        self.results_dict = {}
         self.initialize_combo_boxes()
         self.initialize_buttons()
         self.process_menu_actions()
+        self.make_size_settings()
+        self.backtest_analysis_columns = [
+            "show", "run_id", "run_time", "name", "exchange",
+            "resolution", "begin", "end", "return", "sharpe", "turnover"
+        ]
+        self.backtest_analysis_columns_mapping = {
+            name: i for i, name in enumerate(self.backtest_analysis_columns)
+        }
+
+    def make_size_settings(self):
+        self.tableWidgetAddedAgents.setColumnWidth(0, 100)
+        self.tableWidgetAddedAgents.setColumnWidth(1, 200)
+        self.tableWidgetAddedAgents.setColumnWidth(2, 200)
 
     def initialize_combo_boxes(self):
         self.initialize_agents()
@@ -47,7 +68,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.comboBoxCandlesResolution.activated[str].connect(self.choose_candles_resolution)
 
     def initialize_agents(self):
-        agents_configs_path = "default_agents_configs.json"
+        agents_configs_path = "gui/default_agents_configs.json"
         with open(agents_configs_path) as f:
             self.agents_configs = json.load(f)
         all_items = ['']
@@ -60,6 +81,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.pushButtonAddAgent.clicked.connect(self.add_agent)
         self.pushButtonAddedEdit.clicked.connect(self.edit_agents)
         self.pushButtonAddedDelete.clicked.connect(self.delete_agents)
+        self.pushButtonOpenResults.clicked.connect(self.file_open)
 
     def choose_agent(self):
         self.tableWidgetMainParameters.setRowCount(0)
@@ -98,6 +120,16 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         candles_resolution = self.comboBoxCandlesResolution.currentText()
         print("candles_resolution chosen: %s" % candles_resolution)
         self.spinBoxStep.setValue(RESOLUTIONS[candles_resolution])
+
+    def file_open(self):
+        name = QtWidgets.QFileDialog.getExistingDirectory(None, "Open Directory")
+        self.textEditOpenResults.setText(name)
+        for file in os.listdir(name):
+            if file.startswith("backtest_"):
+                with open(name + '/' + file) as f:
+                    results = json.load(f)
+                    self.add_backtest_result(results)
+                    self.results_dict[file.split('_')[1]] = results
 
     def process_menu_actions(self):
         self.actionQuit.setShortcut("Ctrl+Q")
@@ -184,6 +216,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.tableWidgetAddedAgents.insertRow(numRows)
         agent_class_label = QtWidgets.QLabel()
         agent_class_label.setText(agent_class)
+        scroll_area_agent_class = QtWidgets.QScrollArea()
+        scroll_area_agent_class.setWidget(agent_class_label)
         config_label_main = QtWidgets.QLabel()
         config_label_main.setText(config_main_str)
         scroll_area_main = QtWidgets.QScrollArea()
@@ -192,13 +226,13 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         config_label_other.setText(config_other_str)
         scroll_area_other = QtWidgets.QScrollArea()
         scroll_area_other.setWidget(config_label_other)
-        self.tableWidgetAddedAgents.setCellWidget(numRows, 0, agent_class_label)
+        self.tableWidgetAddedAgents.setCellWidget(numRows, 0, scroll_area_agent_class)
         self.tableWidgetAddedAgents.setCellWidget(numRows, 1, scroll_area_main)
         self.tableWidgetAddedAgents.setCellWidget(numRows, 2, scroll_area_other)
-        header = self.tableWidgetAddedAgents.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        #header = self.tableWidgetAddedAgents.horizontalHeader()
+        #header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        #header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        #header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
 
     def add_agent(self):
         agent_class = self.comboBoxChooseAgent.currentText()
@@ -278,7 +312,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
                 "candles_res": data_config["candles_res"],
                 "step": data_config["step"]
             }
-            agent_class = self.tableWidgetAddedAgents.cellWidget(row, 0).text()
+            agent_class = self.tableWidgetAddedAgents.cellWidget(row, 0).widget().text()
             agent_main_params_str = self.tableWidgetAddedAgents.cellWidget(row, 1).widget().text()
             agent_other_params_str = self.tableWidgetAddedAgents.cellWidget(row, 2).widget().text()
             agent_main_params = json.loads(agent_main_params_str)
@@ -290,14 +324,32 @@ class TechnoTraderMainWindow(Ui_MainWindow):
 
     def convert_results_to_dataframe(self, backtesters_results):
         results = {}
-        for agent_name, test_pc_vector_no_fee, test_pc_vector in backtesters_results:
+        for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector \
+                in backtesters_results:
             results[agent_name + "_returns_no_fee"] = test_pc_vector_no_fee
             results[agent_name + "_returns_with_fee"] = test_pc_vector
+            results[agent_name + "_turnover"] = test_turnover_vector
         df = pd.DataFrame.from_dict(results)
         return df
 
+    def get_backtest_id(self):
+        results_path = self.lineEditDumpPath.text()
+        if len(results_path) == 0:
+            return 0
+        list_dir = set(os.listdir(results_path))
+        if "id_generator.txt" in list_dir:
+            with open(results_path + "/id_generator.txt") as f:
+                backtest_id = int(f.readline()) + 1
+            with open(results_path + "/id_generator.txt", "w") as f:
+                f.write("%d" % backtest_id)
+        else:
+            with open(results_path + "/id_generator.txt", "w") as f:
+                f.write("0")
+                backtest_id = 0
+        return backtest_id
+
     def run_backtest(self):
-        """parse_results = self.parse_configs()
+        parse_results = self.parse_configs()
         if parse_results is not None:
              data_config, backtest_config = parse_results
         else:
@@ -307,20 +359,26 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         print("backtest_config\n", backtest_config)
         print("agents_configs:\n", agents_configs)
         path = self.lineEditDumpPath.text()
+        backtest_id = self.get_backtest_id()
+        backtest_config["id"] = backtest_id
+        backtest_config["time"] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         if len(path) == 0:
             path = None
+        else:
+            path += ("backtest_%d.json" % backtest_id)
+        print("path:", path)
         results = run_multi_backtest(data_config, agents_configs, backtest_config,
                                     path=path, parallel=self.checkBoxParallel.isChecked())
-        results_df = self.convert_results_to_dataframe(results)"""
+        #results_df = self.convert_results_to_dataframe(results)
         #self.window_run_backtest = WindowRunningBacktest()
         #self.window_run_backtest.close()
         self.backtest_completed()
-        results_df = pd.read_csv("test_poloniex_september.csv")
-        agents_names = list(set(x.split('_')[0] for x in results_df.columns))
-        agents_names.remove("cfr")
-        agents_names.extend(["cfr_ogd", "cfr_ons"])
-        #agents_names = [x[0] for x in agents_configs]
-        self.plot_backtest_results(results_df, agents_names)
+        #results_df = pd.read_csv("gui/multi_poloniex_hour_1.csv")
+        #agents_names = [x[:-len("_returns_no_fee")] for x in results_df.columns \
+        #                    if x.endswith("_returns_no_fee")]
+        agents_names = [x[0] for x in agents_configs]
+        self.add_backtest_result(results)
+        self.show_backtest_results(agents_names, results)
 
     def show_error(self, text):
         print("error: %s" % text)
@@ -331,14 +389,54 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         okButton = msg.addButton('OK', QtWidgets.QMessageBox.AcceptRole)
         msg.exec()
 
-    def plot_backtest_results(self, df, agents_names):
-        self.window = BacktestResultsWindow(df, agents_names)
+    def show_results(self):
+        print("Showing results")
+
+    def add_backtest_result(self, results):
+        if len(results["agents"].keys()) == 1:
+            res_agent = list(results["agents"].items())[0]
+            name = [0]
+            returns = np.array(res_agent["returns_no_fee"])
+            final_return = np.cumprod()[-1]
+            sharpe = np.mean(returns - 1) / np.std(returns - 1)
+            turnover = sum(res_agent["turnover"])
+        else:
+            name = "multi"
+            final_return = ''
+            sharpe = ''
+            turnover = ''
+        values = {
+            "run_id": results["backtest_config"]["id"],
+            "run_time": results["backtest_config"]["time"],
+            "name": name,
+            "exchange": results["backtest_config"]["exchange"],
+            "resolution": results["backtest_config"]["candles_res"],
+            "begin": convert_time_to_str(results["backtest_config"]["begin"]),
+            "end": convert_time_to_str(results["backtest_config"]["end"]),
+            "return": final_return,
+            "sharpe": sharpe,
+            "turnover": turnover
+        }
+        numRows = self.tableWidgetBacktestsResults.rowCount()
+        self.tableWidgetBacktestsResults.insertRow(numRows)
+        show_widget = QtWidgets.QPushButton()
+        show_widget.setText("Show")
+        show_widget.clicked.connect(self.show_results)
+        self.tableWidgetBacktestsResults.setCellWidget(numRows, 0, show_widget)
+        for name, value in values.items():
+            widget = QtWidgets.QLabel()
+            if isinstance(value, str):
+                str_format = "%s"
+            elif isinstance(value, float):
+                str_format = "%.3f"
+            elif isinstance(value, int):
+                str_format = "%d"
+            else:
+                ValueError("Wrong format")
+            widget.setText(str_format % value)
+            index = self.backtest_analysis_columns_mapping[name]
+            self.tableWidgetBacktestsResults.setCellWidget(numRows, index, widget)
+
+    def show_backtest_results(self, agents_names, results):
+        self.window = BacktestResultsWindow(agents_names, results)
         self.window.show()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    techno_trader_ui = TechnoTraderMainWindow(MainWindow, app)
-    MainWindow.show()
-    sys.exit(app.exec_())
