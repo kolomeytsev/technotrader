@@ -355,6 +355,9 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         else:
             return
         agents_configs = self.parse_agents(data_config)
+        if len(agents_configs) == 0:
+            self.show_error("Pick agents!")
+            return
         print("data_config\n", data_config)
         print("backtest_config\n", backtest_config)
         print("agents_configs:\n", agents_configs)
@@ -397,11 +400,12 @@ class TechnoTraderMainWindow(Ui_MainWindow):
     def add_backtest_result(self, results):
         if len(results["agents"].keys()) == 1:
             res_agent = list(results["agents"].items())[0]
-            name = [0]
-            returns = np.array(res_agent["returns_no_fee"])
-            final_return = np.cumprod()[-1]
+            name = res_agent[0]
+            agent_dict = res_agent[1]
+            returns = np.array(agent_dict["returns_no_fee"])
+            final_return = np.cumprod(returns)[-1]
             sharpe = np.mean(returns - 1) / np.std(returns - 1)
-            turnover = sum(res_agent["turnover"])
+            turnover = sum(agent_dict["turnover"])
         else:
             name = "multi"
             final_return = ''

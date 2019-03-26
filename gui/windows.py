@@ -89,6 +89,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
         self.pushButtonPlotInstruments.clicked.connect(self.plot_instruments)
         self.pushButtonClearPlot.clicked.connect(self.clear_plot)
+        self.pushButtonPlotUbah.clicked.connect(self.plot_ubah)
+        self.pushButtonPlotUcrp.clicked.connect(self.plot_ucrp)
 
     def get_close_prices(self):
         self.begin_epoch = self.backtest_config["begin"]
@@ -130,6 +132,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.toolbar.setMaximumHeight(25)
         self.verticalLayout_2.addWidget(self.canvas)
         self.verticalLayout_2.addWidget(self.toolbar)
+        self.clear_plot()
 
     def instruments_toolbar(self):
         plot_instruments = ["all"]
@@ -299,8 +302,10 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
 
     def clear_plot(self):
         self.figure.clear()
-        self.canvas.draw()
-        self.clear_flag = True
+        self.ax = self.figure.add_subplot(111)
+        plt.rcParams.update({'font.size': 10})
+        self.finish_plot()
+        #self.clear_flag = True
 
     def finish_plot(self):
         self.figure.tight_layout()
@@ -311,12 +316,12 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         for tick in self.ax.yaxis.get_major_ticks():
             tick.label.set_fontsize(4)
         self.canvas.draw()
-        self.clear_flag = False
+        #self.clear_flag = False
 
     def plot(self):
-        self.figure.clear()
-        self.ax = self.figure.add_subplot(111)
-        plt.rcParams.update({'font.size': 10})
+        #self.figure.clear()
+        #self.ax = self.figure.add_subplot(111)
+        #plt.rcParams.update({'font.size': 10})
         agents_to_plot = self.get_agents_to_plot()
         fee = self.doubleSpinBoxPlotFee.value()
         for agent in agents_to_plot:
@@ -335,13 +340,36 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.finish_plot()
 
     def plot_instruments(self):
-        if not self.clear_flag:
-            self.ax = self.figure.add_subplot(111)
-            plt.rcParams.update({'font.size': 10})
         instruments_to_plot = self.get_instruments_to_plot()
         for instrument in instruments_to_plot:
             data = np.array(self.close_prices[instrument])
             if self.checkBoxNormalized.isChecked():
                 data /= data[0]
             line = self.ax.plot(data, label=instrument, linewidth=0.9)
+        self.finish_plot()
+
+    def plot_ubah(self):
+        instruments_to_plot = self.get_instruments_to_plot()
+        if len(instruments_to_plot) == 0:
+            return
+        data = []
+        for instrument in instruments_to_plot:
+            data.append(self.close_prices[instrument]) 
+        data = np.array(data).T
+        data_normed = data / data[0]
+        ubah = data_normed.mean(1)
+        line = self.ax.plot(ubah, label="UBAH", linewidth=0.9)
+        self.finish_plot()
+    
+    def plot_ucrp(self):
+        instruments_to_plot = self.get_instruments_to_plot()
+        if len(instruments_to_plot) == 0:
+            return
+        data = []
+        for instrument in instruments_to_plot:
+            data.append(self.close_prices[instrument])
+        data = np.array(data).T
+        data_normed = data[1:] / data[:-1]
+        ucrp = np.cumprod(data_normed.mean(1))
+        line = self.ax.plot(ucrp, label="UCRP", linewidth=0.9)
         self.finish_plot()
