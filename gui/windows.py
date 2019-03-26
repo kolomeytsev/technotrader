@@ -62,11 +62,14 @@ class WindowRunningBacktest(QtWidgets.QDialog):
 
 
 class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
-    def __init__(self, agents_names, results):
+    def __init__(self, data_loader, agents_names, results):
         super(BacktestResultsWindow, self).__init__()
+        self.data_loader = data_loader
+        self.instruments_list = results["data_config"]["instruments_list"]
         self.agents_results = results["agents"]
         self.data_config = results["data_config"]
         self.backtest_config = results["backtest_config"]
+        self.close_prices = self.get_close_prices()
         self.setupUi(self)
         self.resize(1300, 850)
         self.agents_names = agents_names
@@ -84,6 +87,41 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.plot()
         self.pushButtonPlot.clicked.connect(self.plot)
         self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
+        self.pushButtonPlotInstruments.clicked.connect(self.plot_instruments)
+        self.pushButtonClearPlot.clicked.connect(self.clear_plot)
+
+    def get_close_prices(self):
+        self.begin_epoch = self.backtest_config["begin"]
+        self.current_epoch = self.begin_epoch
+        self.end_epoch = self.backtest_config["end"]
+        self.step = self.backtest_config["step"]
+        self.epochs = list(range(self.begin_epoch, self.end_epoch, self.step))
+        self.price_label = self.backtest_config["price_label"]
+        self.relevant_columns = [
+            ">".join([
+                self.backtest_config["exchange"],
+                label,
+                self.backtest_config["candles_res"],
+                self.price_label
+            ])
+            for label in self.instruments_list
+        ]
+        self.relevant_columns_dict = {
+            label: ">".join([
+                self.backtest_config["exchange"],
+                label,
+                self.backtest_config["candles_res"],
+                self.price_label
+            ])
+            for label in self.instruments_list
+        }
+        data = self.data_loader.get_data(self.epochs)
+        close_prices = {
+            label: [data[epoch][self.relevant_columns_dict[label]] \
+                for epoch in self.epochs] \
+                for label in self.instruments_list
+        }
+        return close_prices
 
     def initialize_plot(self):
         self.figure = plt.figure()
@@ -93,7 +131,33 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.verticalLayout_2.addWidget(self.canvas)
         self.verticalLayout_2.addWidget(self.toolbar)
 
+    def instruments_toolbar(self):
+        plot_instruments = ["all"]
+        plot_instruments.extend(self.instruments_list)
+        self.toolbuttonInstruments = QtWidgets.QToolButton(self)
+        self.toolbuttonInstruments.setMinimumSize(QtCore.QSize(120, 22))
+        self.toolbuttonInstruments.setText('Select Instruments')
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.toolbuttonInstruments.setFont(font)
+        self.toolmenuInstruments = QtWidgets.QMenu(self)
+        self.instruments_dict = {}
+        for i, instrument in enumerate(plot_instruments):
+            checkBox = QtWidgets.QCheckBox(self.toolmenuInstruments)
+            checkBox.setChecked(False)
+            checkBox.setText(instrument)
+            checkableAction = QtWidgets.QWidgetAction(self.toolmenuInstruments)
+            checkableAction.setDefaultWidget(checkBox)
+            self.toolmenuInstruments.addAction(checkableAction)
+            self.instruments_dict[instrument] = checkBox
+        print("self.instruments_dict", self.instruments_dict)
+        self.toolbuttonInstruments.setMenu(self.toolmenuInstruments)
+        self.toolbuttonInstruments.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.toolbuttonInstruments.setMenu(self.toolmenuInstruments)
+        self.formLayout_2.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.toolbuttonInstruments)
+
     def initialize_combo_boxes(self):
+        self.instruments_toolbar()
         plot_agents = ["all"]
         plot_agents.extend(self.agents_names)
         self.toolbutton = QtWidgets.QToolButton(self)
@@ -204,6 +268,15 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         else:
             raise ValueError("Wrong comboBoxLegend value")
 
+    def get_instruments_to_plot(self):
+        if self.instruments_dict["all"].isChecked():
+            return self.instruments_list
+        else:
+            return [
+                instrument for instrument in self.instruments_list \
+                    if self.instruments_dict[instrument].isChecked()
+            ]
+
     def get_agents_to_plot(self):
         if self.actions_dict["all"].isChecked():
             return self.agents_names
@@ -224,15 +297,25 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             raise ValueError("Wrong comboBoxPlotType value")
         return data
 
-    def plot(self):
-        #for agent, action in self.actions_dict.items():
-        #    print(agent, action.isChecked())           
-        #layout = QtWidgets.QVBoxLayout()
-        #layout.addWidget(self.canvas)
-        #layout.addWidget(self.toolbar)
-        #self.groupBoxPlot.setLayout(layout)
+    def clear_plot(self):
         self.figure.clear()
-        ax = self.figure.add_subplot(111)
+        self.canvas.draw()
+        self.clear_flag = True
+
+    def finish_plot(self):
+        self.figure.tight_layout()
+        self.plot_legend(self.ax)
+        self.ax.grid(color='lightgray', linestyle='dashed')
+        for tick in self.ax.xaxis.get_major_ticks():
+            tick.label.set_fontsize(4)
+        for tick in self.ax.yaxis.get_major_ticks():
+            tick.label.set_fontsize(4)
+        self.canvas.draw()
+        self.clear_flag = False
+
+    def plot(self):
+        self.figure.clear()
+        self.ax = self.figure.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
         agents_to_plot = self.get_agents_to_plot()
         fee = self.doubleSpinBoxPlotFee.value()
@@ -241,20 +324,24 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             returns_with_fee = np.array(
                 self.agents_results[agent]["returns_no_fee"]) - turnover * fee
             data = self.get_cumulative_returns(returns_with_fee)
-            line = ax.plot(data, label=agent, linewidth=0.9)
+            line = self.ax.plot(data, label=agent, linewidth=0.9)
             if self.checkBoxPlotWithNoFee.isChecked():
                 data = self.get_cumulative_returns(
                     np.array(self.agents_results[agent]["returns_no_fee"])
                 )
-                ax.plot(data, label=agent + ", no fee", 
+                self.ax.plot(data, label=agent + ", no fee", 
                         linewidth=0.9, linestyle='--', c=line[0]._color)
+        self.ax.set_ylabel('Returns', size=6)
+        self.finish_plot()
 
-        self.figure.tight_layout()
-        self.plot_legend(ax)
-        ax.grid(color='lightgray', linestyle='dashed')
-        ax.set_ylabel('Returns', size=6)
-        for tick in ax.xaxis.get_major_ticks():
-            tick.label.set_fontsize(4)
-        for tick in ax.yaxis.get_major_ticks():
-            tick.label.set_fontsize(4)
-        self.canvas.draw()
+    def plot_instruments(self):
+        if not self.clear_flag:
+            self.ax = self.figure.add_subplot(111)
+            plt.rcParams.update({'font.size': 10})
+        instruments_to_plot = self.get_instruments_to_plot()
+        for instrument in instruments_to_plot:
+            data = np.array(self.close_prices[instrument])
+            if self.checkBoxNormalized.isChecked():
+                data /= data[0]
+            line = self.ax.plot(data, label=instrument, linewidth=0.9)
+        self.finish_plot()

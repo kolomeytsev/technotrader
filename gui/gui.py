@@ -367,7 +367,9 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         else:
             path += ("backtest_%d.json" % backtest_id)
         print("path:", path)
-        results = run_multi_backtest(data_config, agents_configs, backtest_config,
+        self.data_loader = DataLoader(data_config)
+        results = run_multi_backtest(self.data_loader, data_config, 
+                                    agents_configs, backtest_config,
                                     path=path, parallel=self.checkBoxParallel.isChecked())
         #results_df = self.convert_results_to_dataframe(results)
         #self.window_run_backtest = WindowRunningBacktest()
@@ -438,5 +440,5 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             self.tableWidgetBacktestsResults.setCellWidget(numRows, index, widget)
 
     def show_backtest_results(self, agents_names, results):
-        self.window = BacktestResultsWindow(agents_names, results)
+        self.window = BacktestResultsWindow(self.data_loader, agents_names, results)
         self.window.show()

@@ -290,9 +290,8 @@ def run_backtest(backtester):
     return results
 
 
-def run_multi_backtest(data_config, agent_configs, backtest_config,
+def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
                         args=None, path=None, parallel=False):
-    data_loader = DataLoader(data_config)
     backtesters_list = []
     for agent_class, agent_config in agent_configs:
         agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
@@ -311,8 +310,9 @@ def run_multi_backtest(data_config, agent_configs, backtest_config,
 def main():
     args = parse_parameters()
     data_config, agent_configs, backtest_config = read_configs(args)
-    print("data_config", data_config)    
-    run_multi_backtest(data_config, agent_configs, backtest_config,
+    print("data_config", data_config)
+    data_loader = DataLoader(data_config)
+    run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
                         args, args.path, args.parallel)
 
 
