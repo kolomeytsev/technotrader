@@ -1,503 +1,436 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'backtest_results_window.ui'
-#
-# Created by: PyQt5 UI code generator 5.9.2
-#
-# WARNING! All changes made in this file will be lost!
-
+import sys
+sys.path.insert(0,'../../')
+import numpy as np
+import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
+import time
+import datetime
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+import matplotlib.pyplot as plt
+from technotrader.gui.ui_backtest_results_window import Ui_FormPlot
+from technotrader.gui.utils_gui import *
+from technotrader.utils.metrics import *
+from technotrader.trading.constants import *
 
-class Ui_FormPlot(object):
-    def setupUi(self, FormPlot):
-        FormPlot.setObjectName("FormPlot")
-        FormPlot.resize(1149, 786)
-        self.horizontalLayout = QtWidgets.QHBoxLayout(FormPlot)
-        self.horizontalLayout.setContentsMargins(2, 2, 2, 2)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.tabWidgetBacktestResults = QtWidgets.QTabWidget(FormPlot)
-        self.tabWidgetBacktestResults.setTabPosition(QtWidgets.QTabWidget.North)
-        self.tabWidgetBacktestResults.setTabShape(QtWidgets.QTabWidget.Rounded)
-        self.tabWidgetBacktestResults.setElideMode(QtCore.Qt.ElideRight)
-        self.tabWidgetBacktestResults.setUsesScrollButtons(False)
-        self.tabWidgetBacktestResults.setDocumentMode(True)
-        self.tabWidgetBacktestResults.setTabsClosable(False)
-        self.tabWidgetBacktestResults.setMovable(False)
-        self.tabWidgetBacktestResults.setTabBarAutoHide(False)
-        self.tabWidgetBacktestResults.setObjectName("tabWidgetBacktestResults")
-        self.tabReturns = QtWidgets.QWidget()
-        self.tabReturns.setObjectName("tabReturns")
-        self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.tabReturns)
-        self.verticalLayout_9.setObjectName("verticalLayout_9")
-        self.splitter_2 = QtWidgets.QSplitter(self.tabReturns)
-        self.splitter_2.setOrientation(QtCore.Qt.Vertical)
-        self.splitter_2.setObjectName("splitter_2")
-        self.splitter = QtWidgets.QSplitter(self.splitter_2)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter.setObjectName("splitter")
-        self.groupBoxPlotParameters_2 = QtWidgets.QGroupBox(self.splitter)
-        self.groupBoxPlotParameters_2.setMaximumSize(QtCore.QSize(330, 400))
-        self.groupBoxPlotParameters_2.setObjectName("groupBoxPlotParameters_2")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.groupBoxPlotParameters_2)
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.scrollAreaParameters = QtWidgets.QScrollArea(self.groupBoxPlotParameters_2)
-        self.scrollAreaParameters.setWidgetResizable(True)
-        self.scrollAreaParameters.setObjectName("scrollAreaParameters")
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 322, 360))
-        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.formLayout_5 = QtWidgets.QFormLayout(self.scrollAreaWidgetContents)
-        self.formLayout_5.setObjectName("formLayout_5")
-        self.labelPlotAgents = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelPlotAgents.setObjectName("labelPlotAgents")
-        self.formLayout_5.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.labelPlotAgents)
-        self.labelPlotFee = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelPlotFee.setObjectName("labelPlotFee")
-        self.formLayout_5.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.labelPlotFee)
-        self.doubleSpinBoxPlotFee = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
-        self.doubleSpinBoxPlotFee.setMinimumSize(QtCore.QSize(0, 20))
-        self.doubleSpinBoxPlotFee.setDecimals(4)
-        self.doubleSpinBoxPlotFee.setSingleStep(0.0001)
-        self.doubleSpinBoxPlotFee.setObjectName("doubleSpinBoxPlotFee")
-        self.formLayout_5.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.doubleSpinBoxPlotFee)
-        self.labelPlotType = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelPlotType.setObjectName("labelPlotType")
-        self.formLayout_5.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.labelPlotType)
-        self.comboBoxPlotType = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
-        self.comboBoxPlotType.setObjectName("comboBoxPlotType")
-        self.formLayout_5.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.comboBoxPlotType)
-        self.labelPlotNoFee = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelPlotNoFee.setObjectName("labelPlotNoFee")
-        self.formLayout_5.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.labelPlotNoFee)
-        self.checkBoxPlotWithNoFee = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
-        self.checkBoxPlotWithNoFee.setText("")
-        self.checkBoxPlotWithNoFee.setObjectName("checkBoxPlotWithNoFee")
-        self.formLayout_5.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.checkBoxPlotWithNoFee)
-        self.comboBoxLegend = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
-        self.comboBoxLegend.setObjectName("comboBoxLegend")
-        self.formLayout_5.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.comboBoxLegend)
-        self.pushButtonComputeMetrics = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonComputeMetrics.sizePolicy().hasHeightForWidth())
-        self.pushButtonComputeMetrics.setSizePolicy(sizePolicy)
-        self.pushButtonComputeMetrics.setObjectName("pushButtonComputeMetrics")
-        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.pushButtonComputeMetrics)
-        self.pushButtonPlot = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonPlot.sizePolicy().hasHeightForWidth())
-        self.pushButtonPlot.setSizePolicy(sizePolicy)
-        self.pushButtonPlot.setMinimumSize(QtCore.QSize(140, 0))
-        self.pushButtonPlot.setObjectName("pushButtonPlot")
-        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.pushButtonPlot)
-        self.labelMainInstruments = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelMainInstruments.setObjectName("labelMainInstruments")
-        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.labelMainInstruments)
-        self.pushButtonPlotInstruments = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
-        self.pushButtonPlotInstruments.setObjectName("pushButtonPlotInstruments")
-        self.formLayout_5.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.pushButtonPlotInstruments)
-        self.checkBoxNormalized = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
-        self.checkBoxNormalized.setChecked(True)
-        self.checkBoxNormalized.setObjectName("checkBoxNormalized")
-        self.formLayout_5.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.checkBoxNormalized)
-        self.pushButtonClearPlot = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
-        self.pushButtonClearPlot.setObjectName("pushButtonClearPlot")
-        self.formLayout_5.setWidget(8, QtWidgets.QFormLayout.SpanningRole, self.pushButtonClearPlot)
-        self.groupBoxBaselines = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        self.groupBoxBaselines.setMinimumSize(QtCore.QSize(0, 50))
-        self.groupBoxBaselines.setObjectName("groupBoxBaselines")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBoxBaselines)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.pushButtonPlotUbah = QtWidgets.QPushButton(self.groupBoxBaselines)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonPlotUbah.sizePolicy().hasHeightForWidth())
-        self.pushButtonPlotUbah.setSizePolicy(sizePolicy)
-        self.pushButtonPlotUbah.setObjectName("pushButtonPlotUbah")
-        self.horizontalLayout_2.addWidget(self.pushButtonPlotUbah)
-        self.pushButtonPlotUcrp = QtWidgets.QPushButton(self.groupBoxBaselines)
-        self.pushButtonPlotUcrp.setObjectName("pushButtonPlotUcrp")
-        self.horizontalLayout_2.addWidget(self.pushButtonPlotUcrp)
-        self.formLayout_5.setWidget(9, QtWidgets.QFormLayout.SpanningRole, self.groupBoxBaselines)
-        self.labelLegend = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.labelLegend.setObjectName("labelLegend")
-        self.formLayout_5.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.labelLegend)
-        self.scrollAreaParameters.setWidget(self.scrollAreaWidgetContents)
-        self.verticalLayout_4.addWidget(self.scrollAreaParameters)
-        self.groupBoxMetrics = QtWidgets.QGroupBox(self.splitter)
-        self.groupBoxMetrics.setMinimumSize(QtCore.QSize(300, 0))
-        self.groupBoxMetrics.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.groupBoxMetrics.setObjectName("groupBoxMetrics")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBoxMetrics)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.tableWidgetMetrics = QtWidgets.QTableWidget(self.groupBoxMetrics)
+
+class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
+    def __init__(self, data_loader, results):
+        super(BacktestResultsWindow, self).__init__()
+        self.results = results
+        self.process_results(results)
+        self.data_loader = data_loader
+        if self.data_loader is not None:
+            self.close_prices = self.get_close_prices()
+        else:
+            self.close_prices = None
+        self.setupUi(self)
+        self.resize(1300, 850)
+        self.plot_types = ["cumulative product", "cumulative sum", "returns"]
+        self.legend_positions = ["right", "bottom", "no"]
+        self.initialize_combo_boxes()
+        self.initialize_plot()
+        self.metrics_columns = [
+            "agent", "final_return_sum", "final_return_prod",
+            "apy", "sharpe", "mdd", "turnover", "volatility"
+        ]
+        self.tableWidgetMetrics.setSortingEnabled(True)
+        self.metrics_columns_mapping = {name: i for i, name in enumerate(self.metrics_columns)}
+        self.display_agents_metrics()
+        self.plot()
+        self.pushButtonPlot.clicked.connect(self.plot)
+        self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
+        self.pushButtonPlotInstruments.clicked.connect(self.plot_instruments)
+        self.pushButtonClearPlot.clicked.connect(self.clear_plot)
+        self.pushButtonPlotUbah.clicked.connect(self.plot_ubah)
+        self.pushButtonPlotUcrp.clicked.connect(self.plot_ucrp)
+        self.add_table_columns()
+
+    def add_table_columns(self):
+        self.backtest_info_columns = [
+            "run_id", "run_time", "name", "exchange", 
+            "resolution", "begin", "end", 
+            "return", "sharpe", "turnover", "instruments"
+        ]
+        self.backtest_info_columns_mapping = {name: i for i, name in enumerate(self.backtest_info_columns)}
+
+
+    def get_all_instrument(self, results):
+        all_instruments_list = set()
+        for res in results:
+            all_instruments_list.union(res["data_config"]["instruments_list"])
+        return list(all_instruments_list)
+
+    def gather_agent_results(self, results):
+        agents_results = {}
+        for res in results:
+            for agent_name, val in res["agents"].items():
+                str_addition = '(' + str(res["backtest_config"]["id"]) + ')'
+                new_agent_name = agent_name + str_addition
+                agents_results[new_agent_name] = val
+        print(agents_results.keys())
+        return agents_results
+
+    def process_results(self, results):
+        if not isinstance(results, list):
+            if results["data_config"].get("type") is not None:
+                self.data_type = results["data_config"]["type"]
+            else:
+                self.data_type = "exchange"
+            self.exchange = results["exchange"]
+            self.instruments_list = results["data_config"]["instruments_list"]
+            self.agents_results = results["agents"]
+            self.data_config = results["data_config"]
+            self.backtest_config = results["backtest_config"]
+            self.add_all_backtest_info([results])
+        else:
+            if results[0]["data_config"].get("type") is not None:
+                self.data_type = results[0]["data_config"]["type"]
+            else:
+                self.data_type = "exchange"
+            self.instruments_list = self.get_all_instrument(results)
+            self.begin_epoch = min([r["backtest_config"]["begin"] for r in results])
+            self.end_epoch = max([r["backtest_config"]["end"] for r in results])
+            self.agents_results = self.gather_agent_results(results)
+            self.exchange = results[0]["data_config"]["exchange"]
+            self.add_all_backtest_info(results)
+        self.agents_names = list(self.agents_results.keys())
+
+    def get_close_prices(self):
+        self.begin_epoch = self.backtest_config["begin"]
+        self.current_epoch = self.begin_epoch
+        self.end_epoch = self.backtest_config["end"]
+        self.step = self.backtest_config["step"]
+        self.epochs = list(range(self.begin_epoch, self.end_epoch, self.step))
+        self.price_label = self.backtest_config["price_label"]
+        self.relevant_columns = [
+            ">".join([
+                self.backtest_config["exchange"],
+                label,
+                self.backtest_config["candles_res"],
+                self.price_label
+            ])
+            for label in self.instruments_list
+        ]
+        self.relevant_columns_dict = {
+            label: ">".join([
+                self.backtest_config["exchange"],
+                label,
+                self.backtest_config["candles_res"],
+                self.price_label
+            ])
+            for label in self.instruments_list
+        }
+        data = self.data_loader.get_data(self.epochs)
+        close_prices = {
+            label: [data[epoch][self.relevant_columns_dict[label]] \
+                for epoch in self.epochs] \
+                for label in self.instruments_list
+        }
+        return close_prices
+
+    def initialize_plot(self):
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+        self.toolbar = NavigationToolbar(self.canvas, self.groupBoxPlot)
+        self.toolbar.setMaximumHeight(25)
+        self.verticalLayout_2.addWidget(self.canvas)
+        self.verticalLayout_2.addWidget(self.toolbar)
+        self.clear_plot()
+
+    def instruments_toolbar(self):
+        plot_instruments = ["all"]
+        plot_instruments.extend(self.instruments_list)
+        self.toolbuttonInstruments = QtWidgets.QToolButton(self)
+        self.toolbuttonInstruments.setMinimumSize(QtCore.QSize(120, 22))
+        self.toolbuttonInstruments.setText('Select Instruments')
         font = QtGui.QFont()
         font.setPointSize(13)
-        self.tableWidgetMetrics.setFont(font)
-        self.tableWidgetMetrics.setObjectName("tableWidgetMetrics")
-        self.tableWidgetMetrics.setColumnCount(8)
+        self.toolbuttonInstruments.setFont(font)
+        self.toolmenuInstruments = QtWidgets.QMenu(self)
+        self.instruments_dict = {}
+        for i, instrument in enumerate(plot_instruments):
+            checkBox = QtWidgets.QCheckBox(self.toolmenuInstruments)
+            checkBox.setChecked(False)
+            checkBox.setText(instrument)
+            checkableAction = QtWidgets.QWidgetAction(self.toolmenuInstruments)
+            checkableAction.setDefaultWidget(checkBox)
+            self.toolmenuInstruments.addAction(checkableAction)
+            self.instruments_dict[instrument] = checkBox
+        print("self.instruments_dict", self.instruments_dict)
+        self.toolbuttonInstruments.setMenu(self.toolmenuInstruments)
+        self.toolbuttonInstruments.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.toolbuttonInstruments.setMenu(self.toolmenuInstruments)
+        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.toolbuttonInstruments)
+
+    def initialize_combo_boxes(self):
+        self.instruments_toolbar()
+        plot_agents = ["all"]
+        plot_agents.extend(self.agents_names)
+        self.toolbutton = QtWidgets.QToolButton(self)
+        self.toolbutton.setMinimumSize(QtCore.QSize(120, 22))
+        self.toolbutton.setText('Select Agents')
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.toolbutton.setFont(font)
+        self.toolmenu = QtWidgets.QMenu(self)
+        self.actions_dict = {}
+        for i, agent in enumerate(plot_agents):
+            checkBox = QtWidgets.QCheckBox(self.toolmenu)
+            checkBox.setChecked(True)
+            checkBox.setText(agent)
+            checkableAction = QtWidgets.QWidgetAction(self.toolmenu)
+            checkableAction.setDefaultWidget(checkBox)
+            self.toolmenu.addAction(checkableAction)
+            self.actions_dict[agent] = checkBox
+        self.toolbutton.setMenu(self.toolmenu)
+        self.toolbutton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.toolbutton.setMenu(self.toolmenu)
+        self.formLayout_5.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolbutton)
+        self.comboBoxPlotType.addItems(self.plot_types)
+        self.comboBoxPlotType.activated[str].connect(self.choose_plot_type)
+        self.comboBoxLegend.addItems(self.legend_positions)
+        self.comboBoxLegend.activated[str].connect(self.choose_legend_position)
+
+    def get_number_of_trading_days(self):
+        if self.data_type == "exchange":
+            date_start = datetime.datetime.utcfromtimestamp(self.begin_epoch)
+            date_end = datetime.datetime.utcfromtimestamp(self.end_epoch)
+            return (date_end - date_start).days
+        else:
+            return self.end_epoch - self.begin_epoch
+
+    def compute_metrics(self, data):
+        final_return_sum = np.cumsum(data - 1)[-1] + 1
+        final_return_prod = np.cumprod(data)[-1]
+        volatility = np.std(data - 1)
+        sharpe = np.mean(data - 1) / volatility
+        mdd = compute_max_drawdown(data)
+        number_of_days = self.get_number_of_trading_days()
+        if TRADING_DAYS_NUMBER.get(self.exchange) is not None:
+            trading_days = TRADING_DAYS_NUMBER[self.exchange]
+        else:
+            trading_days = 253
+        power = trading_days / number_of_days
+        metrics =  {
+            "final_return_sum": final_return_sum,
+            "final_return_prod": final_return_prod,
+            "apy": final_return_prod**power - 1,
+            "sharpe": sharpe,
+            "mdd": mdd,
+            "volatility": volatility
+        }
+        return metrics
+
+    def display_computed_metrics(self, metrics, value_format="%.3f"):
+        numRows = self.tableWidgetMetrics.rowCount()
+        self.tableWidgetMetrics.insertRow(numRows)
+        for name, value in metrics.items():
+            widget = QtWidgets.QLabel()
+            if isinstance(value, str):
+                str_format = "%s"
+            else:
+                str_format = value_format
+            widget.setText(str_format % value)
+            index = self.metrics_columns_mapping[name]
+            self.tableWidgetMetrics.setCellWidget(numRows, index, widget)
+
+    def display_agents_metrics(self):
+        #self.metrics = {}
         self.tableWidgetMetrics.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(5, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(6, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetMetrics.setHorizontalHeaderItem(7, item)
-        self.tableWidgetMetrics.horizontalHeader().setDefaultSectionSize(90)
-        self.verticalLayout_3.addWidget(self.tableWidgetMetrics)
-        self.groupBoxPlot = QtWidgets.QGroupBox(self.splitter_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupBoxPlot.sizePolicy().hasHeightForWidth())
-        self.groupBoxPlot.setSizePolicy(sizePolicy)
-        self.groupBoxPlot.setMinimumSize(QtCore.QSize(700, 0))
-        self.groupBoxPlot.setObjectName("groupBoxPlot")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.groupBoxPlot)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.verticalLayout_9.addWidget(self.splitter_2)
-        self.tabWidgetBacktestResults.addTab(self.tabReturns, "")
-        self.tabSharpe = QtWidgets.QWidget()
-        self.tabSharpe.setObjectName("tabSharpe")
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.tabSharpe)
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.splitter_6 = QtWidgets.QSplitter(self.tabSharpe)
-        self.splitter_6.setOrientation(QtCore.Qt.Vertical)
-        self.splitter_6.setObjectName("splitter_6")
-        self.splitter_5 = QtWidgets.QSplitter(self.splitter_6)
-        self.splitter_5.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter_5.setObjectName("splitter_5")
-        self.groupBoxParametersPlot = QtWidgets.QGroupBox(self.splitter_5)
-        self.groupBoxParametersPlot.setMaximumSize(QtCore.QSize(16777215, 70))
-        self.groupBoxParametersPlot.setObjectName("groupBoxParametersPlot")
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.groupBoxParametersPlot)
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.labelSharpeAgents = QtWidgets.QLabel(self.groupBoxParametersPlot)
-        self.labelSharpeAgents.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelSharpeAgents.setObjectName("labelSharpeAgents")
-        self.horizontalLayout_4.addWidget(self.labelSharpeAgents)
-        self.toolbuttonAgentsSharpe = QtWidgets.QToolButton(self.groupBoxParametersPlot)
-        self.toolbuttonAgentsSharpe.setObjectName("toolbuttonAgentsSharpe")
-        self.horizontalLayout_4.addWidget(self.toolbuttonAgentsSharpe)
-        self.labelTickStart = QtWidgets.QLabel(self.groupBoxParametersPlot)
-        self.labelTickStart.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelTickStart.setObjectName("labelTickStart")
-        self.horizontalLayout_4.addWidget(self.labelTickStart)
-        self.spinBoxTickStart = QtWidgets.QSpinBox(self.groupBoxParametersPlot)
-        self.spinBoxTickStart.setMaximum(16777215)
-        self.spinBoxTickStart.setProperty("value", 10)
-        self.spinBoxTickStart.setObjectName("spinBoxTickStart")
-        self.horizontalLayout_4.addWidget(self.spinBoxTickStart)
-        self.labelPlotSharpeFee = QtWidgets.QLabel(self.groupBoxParametersPlot)
-        self.labelPlotSharpeFee.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelPlotSharpeFee.setObjectName("labelPlotSharpeFee")
-        self.horizontalLayout_4.addWidget(self.labelPlotSharpeFee)
-        self.doubleSpinBoxSharpePlotFee = QtWidgets.QDoubleSpinBox(self.groupBoxParametersPlot)
-        self.doubleSpinBoxSharpePlotFee.setMinimumSize(QtCore.QSize(0, 20))
-        self.doubleSpinBoxSharpePlotFee.setDecimals(4)
-        self.doubleSpinBoxSharpePlotFee.setSingleStep(0.0001)
-        self.doubleSpinBoxSharpePlotFee.setObjectName("doubleSpinBoxSharpePlotFee")
-        self.horizontalLayout_4.addWidget(self.doubleSpinBoxSharpePlotFee)
-        self.checkBoxSharpePlotNoFee = QtWidgets.QCheckBox(self.groupBoxParametersPlot)
-        self.checkBoxSharpePlotNoFee.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.checkBoxSharpePlotNoFee.setObjectName("checkBoxSharpePlotNoFee")
-        self.horizontalLayout_4.addWidget(self.checkBoxSharpePlotNoFee)
-        self.labelSharpeLegend = QtWidgets.QLabel(self.groupBoxParametersPlot)
-        self.labelSharpeLegend.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelSharpeLegend.setObjectName("labelSharpeLegend")
-        self.horizontalLayout_4.addWidget(self.labelSharpeLegend)
-        self.comboBoxSharpeLegend = QtWidgets.QComboBox(self.groupBoxParametersPlot)
-        self.comboBoxSharpeLegend.setObjectName("comboBoxSharpeLegend")
-        self.horizontalLayout_4.addWidget(self.comboBoxSharpeLegend)
-        self.pushButtonSharpePlot = QtWidgets.QPushButton(self.groupBoxParametersPlot)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonSharpePlot.sizePolicy().hasHeightForWidth())
-        self.pushButtonSharpePlot.setSizePolicy(sizePolicy)
-        self.pushButtonSharpePlot.setMinimumSize(QtCore.QSize(140, 0))
-        self.pushButtonSharpePlot.setObjectName("pushButtonSharpePlot")
-        self.horizontalLayout_4.addWidget(self.pushButtonSharpePlot)
-        self.pushButtonSharpeClear = QtWidgets.QPushButton(self.groupBoxParametersPlot)
-        self.pushButtonSharpeClear.setObjectName("pushButtonSharpeClear")
-        self.horizontalLayout_4.addWidget(self.pushButtonSharpeClear)
-        self.groupBoxSharpePlot = QtWidgets.QGroupBox(self.splitter_6)
-        self.groupBoxSharpePlot.setObjectName("groupBoxSharpePlot")
-        self.horizontalLayout_3.addWidget(self.splitter_6)
-        self.tabWidgetBacktestResults.addTab(self.tabSharpe, "")
-        self.tabWeights = QtWidgets.QWidget()
-        self.tabWeights.setObjectName("tabWeights")
-        self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.tabWeights)
-        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        self.splitter_8 = QtWidgets.QSplitter(self.tabWeights)
-        self.splitter_8.setOrientation(QtCore.Qt.Vertical)
-        self.splitter_8.setObjectName("splitter_8")
-        self.groupBoxParametersPlot_3 = QtWidgets.QGroupBox(self.splitter_8)
-        self.groupBoxParametersPlot_3.setMaximumSize(QtCore.QSize(16777215, 70))
-        self.groupBoxParametersPlot_3.setObjectName("groupBoxParametersPlot_3")
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.groupBoxParametersPlot_3)
-        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.labelWeightsAgents = QtWidgets.QLabel(self.groupBoxParametersPlot_3)
-        self.labelWeightsAgents.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelWeightsAgents.setObjectName("labelWeightsAgents")
-        self.horizontalLayout_7.addWidget(self.labelWeightsAgents)
-        self.toolButtonWeightsAgents = QtWidgets.QToolButton(self.groupBoxParametersPlot_3)
-        self.toolButtonWeightsAgents.setObjectName("toolButtonWeightsAgents")
-        self.horizontalLayout_7.addWidget(self.toolButtonWeightsAgents)
-        self.labelWeightsLegend = QtWidgets.QLabel(self.groupBoxParametersPlot_3)
-        self.labelWeightsLegend.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelWeightsLegend.setObjectName("labelWeightsLegend")
-        self.horizontalLayout_7.addWidget(self.labelWeightsLegend)
-        self.comboBoxWeightsLegend = QtWidgets.QComboBox(self.groupBoxParametersPlot_3)
-        self.comboBoxWeightsLegend.setObjectName("comboBoxWeightsLegend")
-        self.horizontalLayout_7.addWidget(self.comboBoxWeightsLegend)
-        self.pushButtonWeightsPlot = QtWidgets.QPushButton(self.groupBoxParametersPlot_3)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonWeightsPlot.sizePolicy().hasHeightForWidth())
-        self.pushButtonWeightsPlot.setSizePolicy(sizePolicy)
-        self.pushButtonWeightsPlot.setMinimumSize(QtCore.QSize(140, 0))
-        self.pushButtonWeightsPlot.setObjectName("pushButtonWeightsPlot")
-        self.horizontalLayout_7.addWidget(self.pushButtonWeightsPlot)
-        self.pushButtonWeightsClear = QtWidgets.QPushButton(self.groupBoxParametersPlot_3)
-        self.pushButtonWeightsClear.setObjectName("pushButtonWeightsClear")
-        self.horizontalLayout_7.addWidget(self.pushButtonWeightsClear)
-        self.groupBoxWeights = QtWidgets.QGroupBox(self.splitter_8)
-        self.groupBoxWeights.setObjectName("groupBoxWeights")
-        self.horizontalLayout_8.addWidget(self.splitter_8)
-        self.tabWidgetBacktestResults.addTab(self.tabWeights, "")
-        self.tabAnimation = QtWidgets.QWidget()
-        self.tabAnimation.setObjectName("tabAnimation")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.tabAnimation)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.splitter_7 = QtWidgets.QSplitter(self.tabAnimation)
-        self.splitter_7.setOrientation(QtCore.Qt.Vertical)
-        self.splitter_7.setObjectName("splitter_7")
-        self.groupBoxParametersPlot_2 = QtWidgets.QGroupBox(self.splitter_7)
-        self.groupBoxParametersPlot_2.setMaximumSize(QtCore.QSize(16777215, 70))
-        self.groupBoxParametersPlot_2.setObjectName("groupBoxParametersPlot_2")
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.groupBoxParametersPlot_2)
-        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.labelAnimationAgents = QtWidgets.QLabel(self.groupBoxParametersPlot_2)
-        self.labelAnimationAgents.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelAnimationAgents.setObjectName("labelAnimationAgents")
-        self.horizontalLayout_6.addWidget(self.labelAnimationAgents)
-        self.comboBoxAnimationAgents = QtWidgets.QComboBox(self.groupBoxParametersPlot_2)
-        self.comboBoxAnimationAgents.setObjectName("comboBoxAnimationAgents")
-        self.horizontalLayout_6.addWidget(self.comboBoxAnimationAgents)
-        self.labelSpeed = QtWidgets.QLabel(self.groupBoxParametersPlot_2)
-        self.labelSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.labelSpeed.setObjectName("labelSpeed")
-        self.horizontalLayout_6.addWidget(self.labelSpeed)
-        self.comboBoxSpeed = QtWidgets.QComboBox(self.groupBoxParametersPlot_2)
-        self.comboBoxSpeed.setObjectName("comboBoxSpeed")
-        self.horizontalLayout_6.addWidget(self.comboBoxSpeed)
-        self.pushButtonAnimationPlot = QtWidgets.QPushButton(self.groupBoxParametersPlot_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonAnimationPlot.sizePolicy().hasHeightForWidth())
-        self.pushButtonAnimationPlot.setSizePolicy(sizePolicy)
-        self.pushButtonAnimationPlot.setMinimumSize(QtCore.QSize(140, 0))
-        self.pushButtonAnimationPlot.setObjectName("pushButtonAnimationPlot")
-        self.horizontalLayout_6.addWidget(self.pushButtonAnimationPlot)
-        self.pushButtonAnimationStop = QtWidgets.QPushButton(self.groupBoxParametersPlot_2)
-        self.pushButtonAnimationStop.setObjectName("pushButtonAnimationStop")
-        self.horizontalLayout_6.addWidget(self.pushButtonAnimationStop)
-        self.groupBoxAnimation = QtWidgets.QGroupBox(self.splitter_7)
-        self.groupBoxAnimation.setObjectName("groupBoxAnimation")
-        self.verticalLayout.addWidget(self.splitter_7)
-        self.tabWidgetBacktestResults.addTab(self.tabAnimation, "")
-        self.tabBacktestInfo = QtWidgets.QWidget()
-        self.tabBacktestInfo.setObjectName("tabBacktestInfo")
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.tabBacktestInfo)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.splitter_4 = QtWidgets.QSplitter(self.tabBacktestInfo)
-        self.splitter_4.setOrientation(QtCore.Qt.Vertical)
-        self.splitter_4.setObjectName("splitter_4")
-        self.splitter_3 = QtWidgets.QSplitter(self.splitter_4)
-        self.splitter_3.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter_3.setObjectName("splitter_3")
-        self.groupBoxGeneralInfo = QtWidgets.QGroupBox(self.splitter_3)
-        self.groupBoxGeneralInfo.setMaximumSize(QtCore.QSize(16777215, 300))
-        self.groupBoxGeneralInfo.setObjectName("groupBoxGeneralInfo")
-        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.groupBoxGeneralInfo)
-        self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.tableWidgetGeneralInfo = QtWidgets.QTableWidget(self.groupBoxGeneralInfo)
-        self.tableWidgetGeneralInfo.setObjectName("tableWidgetGeneralInfo")
-        self.tableWidgetGeneralInfo.setColumnCount(11)
-        self.tableWidgetGeneralInfo.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(5, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(6, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(7, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(8, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(9, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(10, item)
-        self.tableWidgetGeneralInfo.horizontalHeader().setDefaultSectionSize(100)
-        self.verticalLayout_8.addWidget(self.tableWidgetGeneralInfo)
-        self.groupBoxAgentsInfo = QtWidgets.QGroupBox(self.splitter_4)
-        self.groupBoxAgentsInfo.setObjectName("groupBoxAgentsInfo")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.groupBoxAgentsInfo)
-        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.tableWidgetAgentsInfo = QtWidgets.QTableWidget(self.groupBoxAgentsInfo)
-        self.tableWidgetAgentsInfo.setObjectName("tableWidgetAgentsInfo")
-        self.tableWidgetAgentsInfo.setColumnCount(3)
-        self.tableWidgetAgentsInfo.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetAgentsInfo.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetAgentsInfo.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidgetAgentsInfo.setHorizontalHeaderItem(2, item)
-        self.tableWidgetAgentsInfo.horizontalHeader().setDefaultSectionSize(120)
-        self.verticalLayout_6.addWidget(self.tableWidgetAgentsInfo)
-        self.verticalLayout_5.addWidget(self.splitter_4)
-        self.tabWidgetBacktestResults.addTab(self.tabBacktestInfo, "")
-        self.horizontalLayout.addWidget(self.tabWidgetBacktestResults)
+        agents_to_plot = self.get_agents_to_plot()
+        fee = self.doubleSpinBoxPlotFee.value()
+        for agent in agents_to_plot:
+            turnover = np.array(self.agents_results[agent]["turnover"])
+            data = np.array(self.agents_results[agent]["returns_no_fee"]) - turnover * fee
+            metrics = self.compute_metrics(data)
+            #self.metrics[agent] = metrics
+            metrics["agent"] = agent
+            metrics["turnover"] = sum(turnover)
+            self.display_computed_metrics(metrics)
+        self.tableWidgetMetrics.sortItems(1)
 
-        self.retranslateUi(FormPlot)
-        self.tabWidgetBacktestResults.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(FormPlot)
+    def choose_agents(self):
+        agents_to_plot = self.comboBoxPlotAgents.currentText()
+        print("agets to plot chosen: %s" % agents_to_plot)
 
-    def retranslateUi(self, FormPlot):
-        _translate = QtCore.QCoreApplication.translate
-        FormPlot.setWindowTitle(_translate("FormPlot", "Backtest Results"))
-        self.groupBoxPlotParameters_2.setTitle(_translate("FormPlot", "Parameters"))
-        self.labelPlotAgents.setText(_translate("FormPlot", "Agents:"))
-        self.labelPlotFee.setText(_translate("FormPlot", "Fee (%):"))
-        self.labelPlotType.setText(_translate("FormPlot", "Plot Type:"))
-        self.labelPlotNoFee.setText(_translate("FormPlot", "Plot No Fee"))
-        self.pushButtonComputeMetrics.setText(_translate("FormPlot", "Compute Metrics"))
-        self.pushButtonPlot.setText(_translate("FormPlot", "Plot"))
-        self.labelMainInstruments.setText(_translate("FormPlot", "Instruments:"))
-        self.pushButtonPlotInstruments.setText(_translate("FormPlot", "Plot Instruments"))
-        self.checkBoxNormalized.setText(_translate("FormPlot", "Normalized"))
-        self.pushButtonClearPlot.setText(_translate("FormPlot", "Clear Plot"))
-        self.groupBoxBaselines.setTitle(_translate("FormPlot", "Baselines"))
-        self.pushButtonPlotUbah.setText(_translate("FormPlot", "Plot UBAH"))
-        self.pushButtonPlotUcrp.setText(_translate("FormPlot", "Plot UCRP"))
-        self.labelLegend.setText(_translate("FormPlot", "Legend:"))
-        self.groupBoxMetrics.setTitle(_translate("FormPlot", "Metrics"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(0)
-        item.setText(_translate("FormPlot", "Agent"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(1)
-        item.setText(_translate("FormPlot", "Return (Sum)"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(2)
-        item.setText(_translate("FormPlot", "Return (Prod)"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(3)
-        item.setText(_translate("FormPlot", "APY"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(4)
-        item.setText(_translate("FormPlot", "Sharpe"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(5)
-        item.setText(_translate("FormPlot", "MDD"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(6)
-        item.setText(_translate("FormPlot", "Turnover"))
-        item = self.tableWidgetMetrics.horizontalHeaderItem(7)
-        item.setText(_translate("FormPlot", "Volatility"))
-        self.groupBoxPlot.setTitle(_translate("FormPlot", "Plot"))
-        self.tabWidgetBacktestResults.setTabText(self.tabWidgetBacktestResults.indexOf(self.tabReturns), _translate("FormPlot", "Returns"))
-        self.groupBoxParametersPlot.setTitle(_translate("FormPlot", "Parameters"))
-        self.labelSharpeAgents.setText(_translate("FormPlot", "Agents:"))
-        self.toolbuttonAgentsSharpe.setText(_translate("FormPlot", "..."))
-        self.labelTickStart.setText(_translate("FormPlot", "Tick Start:"))
-        self.labelPlotSharpeFee.setText(_translate("FormPlot", "Fee (%):"))
-        self.checkBoxSharpePlotNoFee.setText(_translate("FormPlot", "Plot No Fee:"))
-        self.labelSharpeLegend.setText(_translate("FormPlot", "Legend:"))
-        self.pushButtonSharpePlot.setText(_translate("FormPlot", "Plot"))
-        self.pushButtonSharpeClear.setText(_translate("FormPlot", "Clear"))
-        self.groupBoxSharpePlot.setTitle(_translate("FormPlot", "Plot"))
-        self.tabWidgetBacktestResults.setTabText(self.tabWidgetBacktestResults.indexOf(self.tabSharpe), _translate("FormPlot", "Sharpe"))
-        self.groupBoxParametersPlot_3.setTitle(_translate("FormPlot", "Parameters"))
-        self.labelWeightsAgents.setText(_translate("FormPlot", "Agents:"))
-        self.toolButtonWeightsAgents.setText(_translate("FormPlot", "..."))
-        self.labelWeightsLegend.setText(_translate("FormPlot", "Legend:"))
-        self.pushButtonWeightsPlot.setText(_translate("FormPlot", "Plot"))
-        self.pushButtonWeightsClear.setText(_translate("FormPlot", "Clear"))
-        self.groupBoxWeights.setTitle(_translate("FormPlot", "Plot"))
-        self.tabWidgetBacktestResults.setTabText(self.tabWidgetBacktestResults.indexOf(self.tabWeights), _translate("FormPlot", "Weights"))
-        self.groupBoxParametersPlot_2.setTitle(_translate("FormPlot", "Parameters"))
-        self.labelAnimationAgents.setText(_translate("FormPlot", "Agents:"))
-        self.labelSpeed.setText(_translate("FormPlot", "Speed:"))
-        self.pushButtonAnimationPlot.setText(_translate("FormPlot", "Plot Animation"))
-        self.pushButtonAnimationStop.setText(_translate("FormPlot", "Stop"))
-        self.groupBoxAnimation.setTitle(_translate("FormPlot", "Plot"))
-        self.tabWidgetBacktestResults.setTabText(self.tabWidgetBacktestResults.indexOf(self.tabAnimation), _translate("FormPlot", "Weights Animation"))
-        self.groupBoxGeneralInfo.setTitle(_translate("FormPlot", "General Info"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(0)
-        item.setText(_translate("FormPlot", "Run ID"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(1)
-        item.setText(_translate("FormPlot", "Run Time"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(2)
-        item.setText(_translate("FormPlot", "Name"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(3)
-        item.setText(_translate("FormPlot", "Exchange"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(4)
-        item.setText(_translate("FormPlot", "Resolution"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(5)
-        item.setText(_translate("FormPlot", "Begin"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(6)
-        item.setText(_translate("FormPlot", "End"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(7)
-        item.setText(_translate("FormPlot", "Return"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(8)
-        item.setText(_translate("FormPlot", "Sharpe"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(9)
-        item.setText(_translate("FormPlot", "Turnover"))
-        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(10)
-        item.setText(_translate("FormPlot", "Instruments"))
-        self.groupBoxAgentsInfo.setTitle(_translate("FormPlot", "Agents Info"))
-        item = self.tableWidgetAgentsInfo.horizontalHeaderItem(0)
-        item.setText(_translate("FormPlot", "Run ID"))
-        item = self.tableWidgetAgentsInfo.horizontalHeaderItem(1)
-        item.setText(_translate("FormPlot", "Agent"))
-        item = self.tableWidgetAgentsInfo.horizontalHeaderItem(2)
-        item.setText(_translate("FormPlot", "Parameters"))
-        self.tabWidgetBacktestResults.setTabText(self.tabWidgetBacktestResults.indexOf(self.tabBacktestInfo), _translate("FormPlot", "Backtest Info"))
+    def choose_plot_type(self):
+        plot_type = self.comboBoxPlotType.currentText()
+        print("plot type chosen: %s" % plot_type)
 
+    def choose_legend_position(self):
+        plot_type = self.comboBoxLegend.currentText()
+        print("legend position chosen: %s" % plot_type)
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    FormPlot = QtWidgets.QWidget()
-    ui = Ui_FormPlot()
-    ui.setupUi(FormPlot)
-    FormPlot.show()
-    sys.exit(app.exec_())
+    def plot_legend(self, ax):
+        if self.comboBoxLegend.currentText() == "bottom":
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                             box.width, box.height * 0.9])
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                    ncol=5, prop={"size": 5})
+        elif self.comboBoxLegend.currentText() == "right":
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={"size": 5})
+        elif self.comboBoxLegend.currentText() == "no":
+            pass
+        else:
+            raise ValueError("Wrong comboBoxLegend value")
 
+    def get_instruments_to_plot(self):
+        if self.instruments_dict["all"].isChecked():
+            return self.instruments_list
+        else:
+            return [
+                instrument for instrument in self.instruments_list \
+                    if self.instruments_dict[instrument].isChecked()
+            ]
+
+    def get_agents_to_plot(self):
+        if self.actions_dict["all"].isChecked():
+            return self.agents_names
+        else:
+            return [
+                agent for agent in self.agents_names \
+                    if self.actions_dict[agent].isChecked()
+            ]
+
+    def get_cumulative_returns(self, returns):
+        if self.comboBoxPlotType.currentText() == "cumulative sum":
+            data = np.cumsum(returns - 1) + 1
+        elif self.comboBoxPlotType.currentText() == "cumulative product":
+            data = np.cumprod(returns)
+        elif self.comboBoxPlotType.currentText() == "returns":
+            data = returns_with_fee
+        else:
+            raise ValueError("Wrong comboBoxPlotType value")
+        return data
+
+    def clear_plot(self):
+        self.figure.clear()
+        self.ax = self.figure.add_subplot(111)
+        plt.rcParams.update({'font.size': 10})
+        self.finish_plot()
+        #self.clear_flag = True
+
+    def finish_plot(self):
+        self.figure.tight_layout()
+        self.plot_legend(self.ax)
+        self.ax.grid(color='lightgray', linestyle='dashed')
+        for tick in self.ax.xaxis.get_major_ticks():
+            tick.label.set_fontsize(4)
+        for tick in self.ax.yaxis.get_major_ticks():
+            tick.label.set_fontsize(4)
+        self.canvas.draw()
+        #self.clear_flag = False
+
+    def plot(self):
+        #self.figure.clear()
+        #self.ax = self.figure.add_subplot(111)
+        #plt.rcParams.update({'font.size': 10})
+        agents_to_plot = self.get_agents_to_plot()
+        fee = self.doubleSpinBoxPlotFee.value()
+        for agent in agents_to_plot:
+            turnover = np.array(self.agents_results[agent]["turnover"])
+            returns_with_fee = np.array(
+                self.agents_results[agent]["returns_no_fee"]) - turnover * fee
+            data = self.get_cumulative_returns(returns_with_fee)
+            line = self.ax.plot(data, label=agent, linewidth=0.9)
+            if self.checkBoxPlotWithNoFee.isChecked():
+                data = self.get_cumulative_returns(
+                    np.array(self.agents_results[agent]["returns_no_fee"])
+                )
+                self.ax.plot(data, label=agent + ", no fee", 
+                        linewidth=0.9, linestyle='--', c=line[0]._color)
+        self.ax.set_ylabel('Returns', size=6)
+        self.finish_plot()
+
+    def plot_instruments(self):
+        if self.close_prices is None:
+            return
+        instruments_to_plot = self.get_instruments_to_plot()
+        for instrument in instruments_to_plot:
+            data = np.array(self.close_prices[instrument])
+            if self.checkBoxNormalized.isChecked():
+                data /= data[0]
+            line = self.ax.plot(data, label=instrument, linewidth=0.9)
+        self.finish_plot()
+
+    def plot_ubah(self):
+        if self.close_prices is None:
+            return
+        instruments_to_plot = self.get_instruments_to_plot()
+        if len(instruments_to_plot) == 0:
+            return
+        data = []
+        for instrument in instruments_to_plot:
+            data.append(self.close_prices[instrument]) 
+        data = np.array(data).T
+        data_normed = data / data[0]
+        ubah = data_normed.mean(1)
+        line = self.ax.plot(ubah, label="UBAH", linewidth=0.9)
+        self.finish_plot()
+    
+    def plot_ucrp(self):
+        if self.close_prices is None:
+            return
+        instruments_to_plot = self.get_instruments_to_plot()
+        if len(instruments_to_plot) == 0:
+            return
+        data = []
+        for instrument in instruments_to_plot:
+            data.append(self.close_prices[instrument])
+        data = np.array(data).T
+        data_normed = data[1:] / data[:-1]
+        ucrp = np.cumprod(data_normed.mean(1))
+        line = self.ax.plot(ucrp, label="UCRP", linewidth=0.9)
+        self.finish_plot()
+
+    def add_all_backtest_info(self, results):
+        for res in results:
+            self.add_backtest_info(res)
+
+    def add_backtest_info(self, results):
+        if len(results["agents"].keys()) == 1:
+            res_agent = list(results["agents"].items())[0]
+            name = res_agent[0]
+            agent_dict = res_agent[1]
+            returns = np.array(agent_dict["returns_no_fee"])
+            final_return = np.cumprod(returns)[-1]
+            sharpe = np.mean(returns - 1) / np.std(returns - 1)
+            turnover = sum(agent_dict["turnover"])
+        else:
+            name = "multi"
+            final_return = ''
+            sharpe = ''
+            turnover = ''
+        values = {
+            "run_id": results["backtest_config"]["id"],
+            "run_time": results["backtest_config"]["time"],
+            "name": name,
+            "exchange": results["backtest_config"]["exchange"],
+            "resolution": results["backtest_config"]["candles_res"],
+            "begin": convert_time_to_str(results["backtest_config"]["begin"]),
+            "end": convert_time_to_str(results["backtest_config"]["end"]),
+            "return": final_return,
+            "sharpe": sharpe,
+            "turnover": turnover,
+            "instruments": str(results["data_config"]["instruments_list"])
+        }
+        numRows = self.tabWidgetBacktestResults.rowCount()
+        self.row_to_id[numRows] = values["run_id"]
+        self.tabWidgetBacktestResults.insertRow(numRows)
+        for name, value in values.items():
+            widget = QtWidgets.QLabel()
+            if isinstance(value, str):
+                str_format = "%s"
+            elif isinstance(value, float):
+                str_format = "%.3f"
+            elif isinstance(value, int):
+                str_format = "%d"
+            else:
+                ValueError("Wrong format")
+            widget.setText(str_format % value)
+            index = self.backtest_info_columns_mapping[name]
+            self.tabWidgetBacktestResults.setCellWidget(numRows, index, widget)
