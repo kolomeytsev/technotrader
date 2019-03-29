@@ -7,7 +7,7 @@ import argparse
 import datetime
 import pytz
 from technotrader.trading.backtester import BackTester
-from technotrader.data.data_loader import DataLoader
+from technotrader.data_loader.data_loader import DataLoader
 from technotrader.constants import *
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)

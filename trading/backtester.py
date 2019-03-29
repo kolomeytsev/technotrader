@@ -27,6 +27,8 @@ class BackTester(Trader):
         self.test_pc_vector = []
         self.test_pc_vector_no_fee = []
         self.test_turnover_vector = []
+        self.test_epochs = []
+        self.weights = []
         self.last_weights_raw = np.zeros((self.coin_number + 1,))
         self.last_weights_raw[-1] = 1.0
         self.log_frequency = config["log_frequency"]
@@ -43,7 +45,8 @@ class BackTester(Trader):
         df = pd.DataFrame.from_dict({
             "returns_no_fee": self.test_pc_vector_no_fee,
             "returns_with_fee": self.test_pc_vector,
-            "turnover": self.test_turnover_vector
+            "turnover": self.test_turnover_vector,
+            "epochs": self.test_epochs
         })
         df.to_csv(self.dump_path, index=False)
 
@@ -87,5 +90,7 @@ class BackTester(Trader):
         self.test_pc_vector.append(portfolio_change)
         self.test_pc_vector_no_fee.append(portfolio_change_no_fee)
         self.test_turnover_vector.append(turnover)
+        self.weights.append(list(weights))
+        self.test_epochs.append(self.current_epoch)
         if self.dump_path is not None and self.step % self.dump_freq == 0:
             self.save_results()

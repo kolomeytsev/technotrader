@@ -9,26 +9,11 @@ import json
 import qdarkstyle
 from technotrader.run_backtest import *
 from technotrader.gui.mainwindow import Ui_MainWindow
-from technotrader.gui.backtest_results_window import Ui_FormPlot
-from technotrader.gui.windows import WindowRunningBacktest, BacktestResultsWindow
+from technotrader.gui.ui_backtest_results_window import Ui_FormPlot
+from technotrader.gui.backtest_results_window import BacktestResultsWindow
+from technotrader.gui.running_backtest_window import WindowRunningBacktest
 from technotrader.gui.available_parameters import *
-
-
-def get_time_as_name_string(start, end):
-    name_string = "_" + start.replace('/', '').replace(' ', '_') + \
-                  "_" + end.replace('/', '').replace(' ', '')
-    return name_string
-
-
-def convert_time(time_str):
-    dt = datetime.datetime.strptime(
-            time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
-    return int(dt.timestamp())
-
-
-def convert_time_to_str(timestamp):
-    dt = datetime.datetime.utcfromtimestamp(timestamp)
-    return dt.strftime("%Y-%m-%d %H:%M:%S")
+from technotrader.gui.utils_gui import *
 
 
 class TechnoTraderMainWindow(Ui_MainWindow):
@@ -41,6 +26,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.initialize_buttons()
         self.process_menu_actions()
         self.make_size_settings()
+        self.row_to_id = {}
+        self.backtest_results_windows = []
         self.backtest_analysis_columns = [
             "show", "run_id", "run_time", "name", "exchange",
             "resolution", "begin", "end", "return", "sharpe", "turnover"
@@ -48,6 +35,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.backtest_analysis_columns_mapping = {
             name: i for i, name in enumerate(self.backtest_analysis_columns)
         }
+        self.data_type = None
 
     def make_size_settings(self):
         self.tableWidgetAddedAgents.setColumnWidth(0, 100)
@@ -82,6 +70,27 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.pushButtonAddedEdit.clicked.connect(self.edit_agents)
         self.pushButtonAddedDelete.clicked.connect(self.delete_agents)
         self.pushButtonOpenResults.clicked.connect(self.file_open)
+        self.pushButtonCompareBacktests.clicked.connect(self.compare_backtests)
+        self.pushButtonOpenDataFile.clicked.connect(self.open_data_file)
+
+    def open_data_file(self):
+        name = QtWidgets.QFileDialog.getOpenFileName(None, "Open File")
+        print("name", name)
+        self.labelOpenDataFile.setText(name[0].split("/")[-1])
+        if name[0].split(".")[-1].lower() != "csv":
+            self.show_error("File must be in csv format!")
+        else:
+            self.opened_data = pd.read_csv(name[0])
+            self.data_name = name[0].split("/")[-1].split('.')[0]
+            print(self.opened_data.shape)
+            print(self.opened_data.head())
+            self.data_type = "csv"
+            self.comboBoxCandlesResolution.setEnabled(False)
+            self.spinBoxStep.setEnabled(False)
+            self.dateTimeEditDataStart.setEnabled(False)
+            self.dateTimeEditBacktestStart.setEnabled(False)
+            self.dateTimeEditBacktestEnd.setEnabled(False)
+            self.textEditInstruments.setText(str(", ".join(self.opened_data.columns)))
 
     def choose_agent(self):
         self.tableWidgetMainParameters.setRowCount(0)
@@ -113,6 +122,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
 
     def choose_dataset(self):
         exchange_dataset = self.comboBoxDataset.currentText()
+        if len(exchange_dataset):
+            self.data_type = "exchange"
         print("exchange_dataset chosen: %s" % exchange_dataset)
 
     def choose_candles_resolution(self):
@@ -129,7 +140,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
                 with open(name + '/' + file) as f:
                     results = json.load(f)
                     self.add_backtest_result(results)
-                    self.results_dict[file.split('_')[1]] = results
+                    self.results_dict[int(file.split('_')[1].split('.')[0])] = results
 
     def process_menu_actions(self):
         self.actionQuit.setShortcut("Ctrl+Q")
@@ -258,6 +269,9 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         end = self.dateTimeEditBacktestEnd.dateTime()
         end = end.toString(self.dateTimeEditBacktestEnd.displayFormat())
         exchange = self.comboBoxDataset.currentText()
+        if len(exchange) == '':
+            self.show_error("You should pick an exchange or dataset!")
+            return
         print(data_begin)
         if begin >= end:
             self.show_error("Backtest start must be earlier than end!")
@@ -289,7 +303,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             "candles_res": candles_res,
             "candles_res_sec": RESOLUTIONS[candles_res],
             "exchange": exchange,
-            "instruments_list": instruments_list
+            "instruments_list": instruments_list,
+            "type": "exchange"
         }
         backtest_config = {
             "begin":  convert_time(begin),
@@ -349,6 +364,70 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         return backtest_id
 
     def run_backtest(self):
+        if self.data_type is None:
+            self.show_error("Pick Exchange or Dataset!")
+            return
+        if self.data_type == "exchange":
+            self.run_backtest_exchange()
+        else:
+            self.run_backtest_data_file()
+
+    def run_backtest_data_file(self):
+        instruments = self.textEditInstruments.toPlainText()
+        if instruments == '':
+            self.show_error("Pick Instruments!")
+            return
+        instruments_list = self.get_instruments_list(instruments)
+        print("instruments_list", instruments_list)
+        data_config = {
+            "data_name": self.data_name,
+            "begin":  0,
+            "end":  self.opened_data.shape[0],
+            "step": 1,
+            "candles_res": "period",
+            "candles_res_sec": 1,
+            "exchange": self.data_name,
+            "instruments_list": instruments_list,
+            "type": "csv"
+        }
+        data_shift = 10
+        backtest_config = {
+            "begin":  data_shift,
+            "end":  self.opened_data.shape[0],
+            "step": 1,
+            "fee": self.doubleSpinBoxFee.value(),
+            "exchange": self.data_name,
+            "candles_res": "period",
+            "price_label": "close",
+            "log_frequency": 1
+        }
+        agents_configs = self.parse_agents(data_config)
+        if len(agents_configs) == 0:
+            self.show_error("Pick agents!")
+            return
+        print("data_config\n", data_config)
+        print("backtest_config\n", backtest_config)
+        print("agents_configs:\n", agents_configs)
+        path = self.lineEditDumpPath.text()
+        backtest_id = self.get_backtest_id()
+        backtest_config["id"] = backtest_id
+        backtest_config["time"] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        if len(path) == 0:
+            path = None
+        else:
+            path += ("backtest_%d.json" % backtest_id)
+        print("path:", path)
+        self.data_loader = DataLoader(data_config, self.opened_data)
+        results = run_multi_backtest(self.data_loader, data_config, 
+                                    agents_configs, backtest_config,
+                                    path=path, parallel=self.checkBoxParallel.isChecked())
+        print("Completed")
+        self.backtest_completed()
+        agents_names = [x[0] for x in agents_configs]
+        self.add_backtest_result(results)
+        self.show_backtest_results(results, self.data_loader)
+
+    def run_backtest_exchange(self):
         parse_results = self.parse_configs()
         if parse_results is not None:
              data_config, backtest_config = parse_results
@@ -383,7 +462,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         #                    if x.endswith("_returns_no_fee")]
         agents_names = [x[0] for x in agents_configs]
         self.add_backtest_result(results)
-        self.show_backtest_results(agents_names, results)
+        self.show_backtest_results(results, self.data_loader)
 
     def show_error(self, text):
         print("error: %s" % text)
@@ -394,8 +473,11 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         okButton = msg.addButton('OK', QtWidgets.QMessageBox.AcceptRole)
         msg.exec()
 
-    def show_results(self):
+    def show_results(self, numRows):
         print("Showing results")
+        results = self.results_dict[self.row_to_id[numRows]]
+        agents_names = list(results["agents"].keys())
+        self.show_backtest_results(results, None)
 
     def add_backtest_result(self, results):
         if len(results["agents"].keys()) == 1:
@@ -424,10 +506,11 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             "turnover": turnover
         }
         numRows = self.tableWidgetBacktestsResults.rowCount()
+        self.row_to_id[numRows] = values["run_id"]
         self.tableWidgetBacktestsResults.insertRow(numRows)
         show_widget = QtWidgets.QPushButton()
         show_widget.setText("Show")
-        show_widget.clicked.connect(self.show_results)
+        show_widget.clicked.connect(lambda: self.show_results(numRows))
         self.tableWidgetBacktestsResults.setCellWidget(numRows, 0, show_widget)
         for name, value in values.items():
             widget = QtWidgets.QLabel()
@@ -443,6 +526,22 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             index = self.backtest_analysis_columns_mapping[name]
             self.tableWidgetBacktestsResults.setCellWidget(numRows, index, widget)
 
-    def show_backtest_results(self, agents_names, results):
-        self.window = BacktestResultsWindow(self.data_loader, agents_names, results)
-        self.window.show()
+    def show_backtest_results(self, results, data_loader):
+        window = BacktestResultsWindow(data_loader, results)
+        self.backtest_results_windows.append(window)
+        window.show()
+
+    def compare_backtests(self):
+        rows = self.tableWidgetBacktestsResults.selectionModel().selectedRows()
+        print("rows:", rows)
+        results = [self.results_dict[self.row_to_id[r.row()]] for r in rows]
+        data_types = set()
+        for r in results:
+            if r["data_config"].get("type") is not None:
+                data_types.add(r["data_config"]["type"])
+            else:
+                data_types.add("exchange")
+        if len(data_types) > 1:
+            self.show_error("Cannot compare backtests with different data types!")
+            return
+        self.show_backtest_results(results, None)

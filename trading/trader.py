@@ -42,8 +42,6 @@ class Trader:
         self.current_epoch = self.begin_epoch
         self.end_epoch = config["end"]
         self.step = config["step"]
-        #columns_list = ["return", "turnover"]
-        #self.full_result = {x : [] for x in columns_list} 
 
     def execute_trades(self, weights):
         pass

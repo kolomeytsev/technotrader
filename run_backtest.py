@@ -13,7 +13,7 @@ import pandas as pd
 import multiprocessing
 from multiprocessing import Pool
 from technotrader.trading.backtester import BackTester
-from technotrader.data.data_loader import DataLoader
+from technotrader.data_loader.data_loader import DataLoader
 from technotrader.trading.constants import *
 import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -250,11 +250,12 @@ def read_configs(args):
 def save_results_df(backtesters_results, path):
     print("saving results")
     results = {}
-    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector \
+    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs \
             in backtesters_results:
         results[agent_name + "_returns_no_fee"] = test_pc_vector_no_fee
         results[agent_name + "_returns_with_fee"] = test_pc_vector
         results[agent_name + "_turnover"] = test_turnover_vector
+        results[agent_name + "_epochs"] = epochs
     df = pd.DataFrame.from_dict(results)
     df.to_csv(path, index=False)
 
@@ -267,12 +268,14 @@ def save_results(backtesters_results, data_config, agent_configs, backtest_confi
         "agents": {}
     }
     agent_configs_dict = dict(agent_configs)
-    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector \
+    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs, weights \
             in backtesters_results:
         results["agents"][agent_name] = {}
         results["agents"][agent_name]["returns_no_fee"] = list(test_pc_vector_no_fee)
         results["agents"][agent_name]["returns_with_fee"] = list(test_pc_vector)
         results["agents"][agent_name]["turnover"] = list(test_turnover_vector)
+        results["agents"][agent_name]["weights"] = weights
+        results["agents"][agent_name]["epochs"] = list(epochs)
         results["agents"][agent_name]["config"] = agent_configs_dict[agent_name]
     with open(path, "w") as f:
         json.dump(results, f)
@@ -285,7 +288,9 @@ def run_backtest(backtester):
         backtester.agent.config["agent_name"],
         backtester.test_pc_vector_no_fee,
         backtester.test_pc_vector,
-        backtester.test_turnover_vector
+        backtester.test_turnover_vector,
+        backtester.test_epochs,
+        backtester.weights
     )
     return results
 

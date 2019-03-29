@@ -1,12 +1,6 @@
 EXCHANGES_DATASETS = [
-    "poloniex",
-    "binance", 
-    "NYSE(O)",
-    "NYSE(N)",
-    "MSCI",
-    "TSE",
-    "SP500",
-    "DJIA"
+    "",
+    "poloniex"
 ]
 
 

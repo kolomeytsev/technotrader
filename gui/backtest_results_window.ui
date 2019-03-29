@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Backtest Results</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="leftMargin">
     <number>2</number>
    </property>
@@ -55,23 +55,11 @@
      <property name="tabBarAutoHide">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="tabMainResults">
+     <widget class="QWidget" name="tabReturns">
       <attribute name="title">
-       <string>Main</string>
+       <string>Returns</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="leftMargin">
-        <number>5</number>
-       </property>
-       <property name="topMargin">
-        <number>5</number>
-       </property>
-       <property name="rightMargin">
-        <number>5</number>
-       </property>
-       <property name="bottomMargin">
-        <number>5</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
         <widget class="QSplitter" name="splitter_2">
          <property name="orientation">
@@ -81,201 +69,220 @@
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <widget class="QGroupBox" name="groupBoxPlotParameters">
+          <widget class="QGroupBox" name="groupBoxPlotParameters_2">
            <property name="maximumSize">
             <size>
-             <width>300</width>
-             <height>16777215</height>
+             <width>330</width>
+             <height>400</height>
             </size>
            </property>
            <property name="title">
             <string>Parameters</string>
            </property>
-           <layout class="QFormLayout" name="formLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="leftMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>6</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelPlotAgents">
-              <property name="text">
-               <string>Agents:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelPlotFee">
-              <property name="text">
-               <string>Fee (%):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QDoubleSpinBox" name="doubleSpinBoxPlotFee">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="decimals">
-               <number>4</number>
-              </property>
-              <property name="singleStep">
-               <double>0.000100000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelPlotType">
-              <property name="text">
-               <string>Plot Type:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="comboBoxPlotType"/>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="labelPlotNoFee">
-              <property name="text">
-               <string>Plot No Fee</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QCheckBox" name="checkBoxPlotWithNoFee">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="labelLegend">
-              <property name="text">
-               <string>Legend:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QComboBox" name="comboBoxLegend"/>
-            </item>
-            <item row="5" column="0">
-             <widget class="QPushButton" name="pushButtonComputeMetrics">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Compute Metrics</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QPushButton" name="pushButtonPlot">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>140</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Plot</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="labelMainInstruments">
-              <property name="text">
-               <string>Instruments:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QPushButton" name="pushButtonPlotInstruments">
-              <property name="text">
-               <string>Plot Instruments</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QCheckBox" name="checkBoxNormalized">
-              <property name="text">
-               <string>Normalized</string>
-              </property>
-              <property name="checked">
+            <item>
+             <widget class="QScrollArea" name="scrollAreaParameters">
+              <property name="widgetResizable">
                <bool>true</bool>
               </property>
-             </widget>
-            </item>
-            <item row="8" column="0" colspan="2">
-             <widget class="QPushButton" name="pushButtonClearPlot">
-              <property name="text">
-               <string>Clear Plot</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0" colspan="2">
-             <widget class="QGroupBox" name="groupBox">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>Baselines</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <property name="leftMargin">
-                <number>0</number>
+              <widget class="QWidget" name="scrollAreaWidgetContents">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>322</width>
+                 <height>360</height>
+                </rect>
                </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QPushButton" name="pushButtonPlotUbah">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Plot UBAH</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonPlotUcrp">
-                 <property name="text">
-                  <string>Plot UCRP</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+               <layout class="QFormLayout" name="formLayout_5">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="labelPlotAgents">
+                  <property name="text">
+                   <string>Agents:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="labelPlotFee">
+                  <property name="text">
+                   <string>Fee (%):</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QDoubleSpinBox" name="doubleSpinBoxPlotFee">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="decimals">
+                   <number>4</number>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.000100000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="labelPlotType">
+                  <property name="text">
+                   <string>Plot Type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="comboBoxPlotType"/>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="labelPlotNoFee">
+                  <property name="text">
+                   <string>Plot No Fee</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="checkBoxPlotWithNoFee">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QComboBox" name="comboBoxLegend"/>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QPushButton" name="pushButtonComputeMetrics">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Compute Metrics</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QPushButton" name="pushButtonPlot">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>140</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Plot</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="labelMainInstruments">
+                  <property name="text">
+                   <string>Instruments:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QPushButton" name="pushButtonPlotInstruments">
+                  <property name="text">
+                   <string>Plot Instruments</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QCheckBox" name="checkBoxNormalized">
+                  <property name="text">
+                   <string>Normalized</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0" colspan="2">
+                 <widget class="QPushButton" name="pushButtonClearPlot">
+                  <property name="text">
+                   <string>Clear Plot</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0" colspan="2">
+                 <widget class="QGroupBox" name="groupBoxBaselines">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>50</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Baselines</string>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_2">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonPlotUbah">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Plot UBAH</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonPlotUcrp">
+                     <property name="text">
+                      <string>Plot UCRP</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="labelLegend">
+                  <property name="text">
+                   <string>Legend:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
            </layout>
@@ -399,10 +406,326 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabOtherResults">
+     <widget class="QWidget" name="tabSharpe">
       <attribute name="title">
-       <string>Other</string>
+       <string>Sharpe</string>
       </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QSplitter" name="splitter_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QSplitter" name="splitter_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QGroupBox" name="groupBoxParametersPlot">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>70</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Parameters</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="labelSharpeAgents">
+              <property name="text">
+               <string>Agents:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="toolbuttonAgentsSharpe">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelTickStart">
+              <property name="text">
+               <string>Tick Start:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBoxTickStart">
+              <property name="maximum">
+               <number>16777215</number>
+              </property>
+              <property name="value">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelPlotSharpeFee">
+              <property name="text">
+               <string>Fee (%):</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxSharpePlotFee">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="decimals">
+               <number>4</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxSharpePlotNoFee">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="text">
+               <string>Plot No Fee:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelSharpeLegend">
+              <property name="text">
+               <string>Legend:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBoxSharpeLegend"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonSharpePlot">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>140</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Plot</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonSharpeClear">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+         <widget class="QGroupBox" name="groupBoxSharpePlot">
+          <property name="title">
+           <string>Plot</string>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabWeights">
+      <attribute name="title">
+       <string>Weights</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <widget class="QSplitter" name="splitter_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QGroupBox" name="groupBoxParametersPlot_3">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Parameters</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QLabel" name="labelWeightsAgents">
+             <property name="text">
+              <string>Agents:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButtonWeightsAgents">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelWeightsLegend">
+             <property name="text">
+              <string>Legend:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxWeightsLegend"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonWeightsPlot">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>140</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Plot</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonWeightsClear">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QGroupBox" name="groupBoxWeights">
+          <property name="title">
+           <string>Plot</string>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabAnimation">
+      <attribute name="title">
+       <string>Weights Animation</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QSplitter" name="splitter_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QGroupBox" name="groupBoxParametersPlot_2">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Parameters</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="labelAnimationAgents">
+             <property name="text">
+              <string>Agents:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxAnimationAgents"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelSpeed">
+             <property name="text">
+              <string>Speed:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxSpeed"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonAnimationPlot">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>140</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Plot Animation</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonAnimationStop">
+             <property name="text">
+              <string>Stop</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QGroupBox" name="groupBoxAnimation">
+          <property name="title">
+           <string>Plot</string>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tabBacktestInfo">
       <attribute name="title">
@@ -419,144 +742,88 @@
            <enum>Qt::Horizontal</enum>
           </property>
           <widget class="QGroupBox" name="groupBoxGeneralInfo">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>300</height>
+            </size>
+           </property>
            <property name="title">
             <string>General Info</string>
            </property>
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelRunId">
-              <property name="text">
-               <string>Run ID:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="lineEditRunId">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelRunTime">
-              <property name="text">
-               <string>Run Time:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="lineEditRunTime">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QGroupBox" name="groupBoxBacktestInfo">
-           <property name="title">
-            <string>Backtest Info</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout_3">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelDataset">
-              <property name="text">
-               <string>Exchange or Dataset:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="lineEditDataset">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelInstruments">
-              <property name="text">
-               <string>Instruments:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QTextEdit" name="textEditInstruments">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelResolution">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Resolution:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="lineEditResolution">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="labelStep">
-              <property name="text">
-               <string>Step:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLineEdit" name="lineEditStep">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="labelFee">
-              <property name="text">
-               <string>Fee (%):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLineEdit" name="lineEditFee">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="labelBacktestStart">
-              <property name="text">
-               <string>Backtest Start:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLineEdit" name="lineEditBacktestStart">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="labelBacktestEnd">
-              <property name="text">
-               <string>Backtest End:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QLineEdit" name="lineEditBacktestEnd">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QTableWidget" name="tableWidgetGeneralInfo">
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>100</number>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>Run ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Run Time</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Name</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Exchange</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Resolution</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Begin</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>End</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Return</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Sharpe</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Turnover</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Instruments</string>
+               </property>
+              </column>
              </widget>
             </item>
            </layout>
@@ -582,8 +849,13 @@
            <item>
             <widget class="QTableWidget" name="tableWidgetAgentsInfo">
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>500</number>
+              <number>120</number>
              </attribute>
+             <column>
+              <property name="text">
+               <string>Run ID</string>
+              </property>
+             </column>
              <column>
               <property name="text">
                <string>Agent</string>
