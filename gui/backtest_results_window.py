@@ -17,6 +17,8 @@ from technotrader.trading.constants import *
 class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
     def __init__(self, data_loader, results):
         super(BacktestResultsWindow, self).__init__()
+        self.setupUi(self)
+        self.add_table_columns()
         self.results = results
         self.process_results(results)
         self.data_loader = data_loader
@@ -24,7 +26,6 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             self.close_prices = self.get_close_prices()
         else:
             self.close_prices = None
-        self.setupUi(self)
         self.resize(1300, 850)
         self.plot_types = ["cumulative product", "cumulative sum", "returns"]
         self.legend_positions = ["right", "bottom", "no"]
@@ -44,7 +45,6 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.pushButtonClearPlot.clicked.connect(self.clear_plot)
         self.pushButtonPlotUbah.clicked.connect(self.plot_ubah)
         self.pushButtonPlotUcrp.clicked.connect(self.plot_ucrp)
-        self.add_table_columns()
 
     def add_table_columns(self):
         self.backtest_info_columns = [
@@ -53,7 +53,13 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             "return", "sharpe", "turnover", "instruments"
         ]
         self.backtest_info_columns_mapping = {name: i for i, name in enumerate(self.backtest_info_columns)}
+        self.tableWidgetGeneralInfo.setColumnWidth(self.backtest_info_columns_mapping["instruments"], 500)
 
+        self.agent_info_columns = [
+            "run_id", "agent_name", "parameters"
+        ]
+        self.agent_info_columns_mapping = {name: i for i, name in enumerate(self.agent_info_columns)}
+        self.tableWidgetAgentsInfo.setColumnWidth(self.agent_info_columns_mapping["parameters"], 1000)
 
     def get_all_instrument(self, results):
         all_instruments_list = set()
@@ -77,7 +83,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.data_type = results["data_config"]["type"]
             else:
                 self.data_type = "exchange"
-            self.exchange = results["exchange"]
+            self.exchange = results["backtest_config"]["exchange"]
             self.instruments_list = results["data_config"]["instruments_list"]
             self.agents_results = results["agents"]
             self.data_config = results["data_config"]
@@ -390,6 +396,26 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
     def add_all_backtest_info(self, results):
         for res in results:
             self.add_backtest_info(res)
+            self.add_agents(res)
+
+    def add_agent(self, run_id, agent, agents_result):
+        numRows = self.tableWidgetAgentsInfo.rowCount()
+        self.tableWidgetAgentsInfo.insertRow(numRows)
+        widget = QtWidgets.QLabel()
+        widget.setText(str(run_id))
+        self.tableWidgetAgentsInfo.setCellWidget(numRows, 0, widget)
+        widget = QtWidgets.QLabel()
+        widget.setText(str(agent))
+        self.tableWidgetAgentsInfo.setCellWidget(numRows, 1, widget)
+        widget = QtWidgets.QLabel()
+        widget.setText(str(agents_result["config"]))
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidget(widget)
+        self.tableWidgetAgentsInfo.setCellWidget(numRows, 2, scroll_area)
+
+    def add_agents(self, res):
+        for agent, agents_result in res["agents"].items():
+            self.add_agent(res["backtest_config"]["id"], agent, agents_result)
 
     def add_backtest_info(self, results):
         if len(results["agents"].keys()) == 1:
@@ -418,9 +444,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             "turnover": turnover,
             "instruments": str(results["data_config"]["instruments_list"])
         }
-        numRows = self.tabWidgetBacktestResults.rowCount()
-        self.row_to_id[numRows] = values["run_id"]
-        self.tabWidgetBacktestResults.insertRow(numRows)
+        numRows = self.tableWidgetGeneralInfo.rowCount()
+        self.tableWidgetGeneralInfo.insertRow(numRows)
         for name, value in values.items():
             widget = QtWidgets.QLabel()
             if isinstance(value, str):
@@ -433,4 +458,4 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 ValueError("Wrong format")
             widget.setText(str_format % value)
             index = self.backtest_info_columns_mapping[name]
-            self.tabWidgetBacktestResults.setCellWidget(numRows, index, widget)
+            self.tableWidgetGeneralInfo.setCellWidget(numRows, index, widget)

@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 import copy
 import datetime
+import pytz
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.animation import TimedAnimation
