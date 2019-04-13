@@ -31,6 +31,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.legend_positions = ["right", "bottom", "no"]
         self.initialize_combo_boxes()
         self.initialize_plot()
+        self.initialize_plot_sharpe()
+        self.initialize_plot_weights()
         self.metrics_columns = [
             "agent", "final_return_sum", "final_return_prod",
             "apy", "sharpe", "mdd", "turnover", "volatility"
@@ -38,11 +40,14 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.tableWidgetMetrics.setSortingEnabled(True)
         self.metrics_columns_mapping = {name: i for i, name in enumerate(self.metrics_columns)}
         self.display_agents_metrics()
-        self.plot()
         self.pushButtonPlot.clicked.connect(self.plot)
+        self.pushButtonSharpePlot.clicked.connect(self.plot_sharpe)
+        #self.pushButtonPlot.clicked.connect(self.plot)
         self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
         self.pushButtonPlotInstruments.clicked.connect(self.plot_instruments)
-        self.pushButtonClearPlot.clicked.connect(self.clear_plot)
+        self.pushButtonClearPlot.clicked.connect(self.clear_plot_returns)
+        self.pushButtonSharpeClear.clicked.connect(self.clear_plot_sharpe)
+        self.pushButtonWeightsClear.clicked.connect(self.clear_plot_weights)
         self.pushButtonPlotUbah.clicked.connect(self.plot_ubah)
         self.pushButtonPlotUcrp.clicked.connect(self.plot_ucrp)
 
@@ -85,6 +90,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.data_type = "exchange"
             self.exchange = results["backtest_config"]["exchange"]
             self.instruments_list = results["data_config"]["instruments_list"]
+            self.begin_epoch = results["backtest_config"]["begin"]
+            self.end_epoch = results["backtest_config"]["end"]
             self.agents_results = results["agents"]
             self.data_config = results["data_config"]
             self.backtest_config = results["backtest_config"]
@@ -142,7 +149,31 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.toolbar.setMaximumHeight(25)
         self.verticalLayout_2.addWidget(self.canvas)
         self.verticalLayout_2.addWidget(self.toolbar)
-        self.clear_plot()
+        self.clear_plot_returns()
+        self.plot()
+
+    def initialize_plot_sharpe(self):
+        self.verticalLayoutSharpe = QtWidgets.QVBoxLayout(self.groupBoxSharpePlot)
+        self.verticalLayoutSharpe.setContentsMargins(0, 0, 0, 0)
+        self.figure_sharpe = plt.figure()
+        self.canvas_sharpe = FigureCanvas(self.figure_sharpe)
+        self.toolbar_sharpe = NavigationToolbar(self.canvas_sharpe, self.groupBoxSharpePlot)
+        self.toolbar_sharpe.setMaximumHeight(25)
+        self.verticalLayoutSharpe.addWidget(self.canvas_sharpe)
+        self.verticalLayoutSharpe.addWidget(self.toolbar_sharpe)
+        self.clear_plot_sharpe()
+        self.plot_sharpe()
+
+    def initialize_plot_weights(self):
+        self.verticalLayoutWeights = QtWidgets.QVBoxLayout(self.groupBoxWeights)
+        self.verticalLayoutWeights.setContentsMargins(0, 0, 0, 0)
+        self.figure_weights = plt.figure()
+        self.canvas_weights = FigureCanvas(self.figure_weights)
+        self.toolbar_weights = NavigationToolbar(self.canvas_weights, self.groupBoxWeights)
+        self.toolbar_weights.setMaximumHeight(25)
+        self.verticalLayoutWeights.addWidget(self.canvas_weights)
+        self.verticalLayoutWeights.addWidget(self.toolbar_weights)
+        self.clear_plot_weights()
 
     def instruments_toolbar(self):
         plot_instruments = ["all"]
@@ -169,30 +200,36 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.toolbuttonInstruments.setMenu(self.toolmenuInstruments)
         self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.toolbuttonInstruments)
 
-    def initialize_combo_boxes(self):
-        self.instruments_toolbar()
+    def initialize_agents_choice_box(self, toolbutton):
         plot_agents = ["all"]
         plot_agents.extend(self.agents_names)
-        self.toolbutton = QtWidgets.QToolButton(self)
-        self.toolbutton.setMinimumSize(QtCore.QSize(120, 22))
-        self.toolbutton.setText('Select Agents')
+        toolbutton.setMinimumSize(QtCore.QSize(120, 22))
+        toolbutton.setText('Select Agents')
         font = QtGui.QFont()
         font.setPointSize(13)
-        self.toolbutton.setFont(font)
-        self.toolmenu = QtWidgets.QMenu(self)
-        self.actions_dict = {}
+        toolbutton.setFont(font)
+        toolmenu = QtWidgets.QMenu(self)
+        actions_dict = {}
         for i, agent in enumerate(plot_agents):
-            checkBox = QtWidgets.QCheckBox(self.toolmenu)
+            checkBox = QtWidgets.QCheckBox(toolmenu)
             checkBox.setChecked(True)
             checkBox.setText(agent)
-            checkableAction = QtWidgets.QWidgetAction(self.toolmenu)
+            checkableAction = QtWidgets.QWidgetAction(toolmenu)
             checkableAction.setDefaultWidget(checkBox)
-            self.toolmenu.addAction(checkableAction)
-            self.actions_dict[agent] = checkBox
-        self.toolbutton.setMenu(self.toolmenu)
-        self.toolbutton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.toolbutton.setMenu(self.toolmenu)
-        self.formLayout_5.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolbutton)
+            toolmenu.addAction(checkableAction)
+            actions_dict[agent] = checkBox
+        toolbutton.setMenu(toolmenu)
+        toolbutton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        toolbutton.setMenu(toolmenu)
+        return actions_dict
+
+    def initialize_combo_boxes(self):
+        self.instruments_toolbar()
+        self.toolbutton_returns = QtWidgets.QToolButton(self)
+        self.actions_dict = self.initialize_agents_choice_box(self.toolbutton_returns)
+        self.formLayout_5.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolbutton_returns)
+        self.actions_dict_sharpe = self.initialize_agents_choice_box(self.toolbuttonAgentsSharpe)
+
         self.comboBoxPlotType.addItems(self.plot_types)
         self.comboBoxPlotType.activated[str].connect(self.choose_plot_type)
         self.comboBoxLegend.addItems(self.legend_positions)
@@ -244,7 +281,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
     def display_agents_metrics(self):
         #self.metrics = {}
         self.tableWidgetMetrics.setRowCount(0)
-        agents_to_plot = self.get_agents_to_plot()
+        agents_to_plot = self.get_agents_to_plot(self.actions_dict)
         fee = self.doubleSpinBoxPlotFee.value()
         for agent in agents_to_plot:
             turnover = np.array(self.agents_results[agent]["turnover"])
@@ -293,13 +330,13 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                     if self.instruments_dict[instrument].isChecked()
             ]
 
-    def get_agents_to_plot(self):
-        if self.actions_dict["all"].isChecked():
+    def get_agents_to_plot(self, actions_dict):
+        if actions_dict["all"].isChecked():
             return self.agents_names
         else:
             return [
                 agent for agent in self.agents_names \
-                    if self.actions_dict[agent].isChecked()
+                    if actions_dict[agent].isChecked()
             ]
 
     def get_cumulative_returns(self, returns):
@@ -313,29 +350,41 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             raise ValueError("Wrong comboBoxPlotType value")
         return data
 
-    def clear_plot(self):
+    def clear_plot_returns(self):
         self.figure.clear()
         self.ax = self.figure.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
-        self.finish_plot()
+        self.finish_plot(self.figure, self.ax, self.canvas)
         #self.clear_flag = True
 
-    def finish_plot(self):
-        self.figure.tight_layout()
-        self.plot_legend(self.ax)
-        self.ax.grid(color='lightgray', linestyle='dashed')
-        for tick in self.ax.xaxis.get_major_ticks():
+    def clear_plot_sharpe(self):
+        self.figure_sharpe.clear()
+        self.ax_sharpe = self.figure_sharpe.add_subplot(111)
+        plt.rcParams.update({'font.size': 10})
+        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe)
+
+    def clear_plot_weights(self):
+        self.figure_weights.clear()
+        self.ax_weights = self.figure_weights.add_subplot(111)
+        plt.rcParams.update({'font.size': 10})
+        self.finish_plot(self.figure_weights, self.ax_weights, self.canvas_weights)
+
+    def finish_plot(self, figure, ax, canvas):
+        figure.tight_layout()
+        self.plot_legend(ax)
+        ax.grid(color='lightgray', linestyle='dashed')
+        for tick in ax.xaxis.get_major_ticks():
             tick.label.set_fontsize(4)
-        for tick in self.ax.yaxis.get_major_ticks():
+        for tick in ax.yaxis.get_major_ticks():
             tick.label.set_fontsize(4)
-        self.canvas.draw()
+        canvas.draw()
         #self.clear_flag = False
 
     def plot(self):
         #self.figure.clear()
         #self.ax = self.figure.add_subplot(111)
         #plt.rcParams.update({'font.size': 10})
-        agents_to_plot = self.get_agents_to_plot()
+        agents_to_plot = self.get_agents_to_plot(self.actions_dict)
         fee = self.doubleSpinBoxPlotFee.value()
         for agent in agents_to_plot:
             turnover = np.array(self.agents_results[agent]["turnover"])
@@ -350,7 +399,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.ax.plot(data, label=agent + ", no fee", 
                         linewidth=0.9, linestyle='--', c=line[0]._color)
         self.ax.set_ylabel('Returns', size=6)
-        self.finish_plot()
+        self.finish_plot(self.figure, self.ax, self.canvas)
 
     def plot_instruments(self):
         if self.close_prices is None:
@@ -361,7 +410,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             if self.checkBoxNormalized.isChecked():
                 data /= data[0]
             line = self.ax.plot(data, label=instrument, linewidth=0.9)
-        self.finish_plot()
+        self.finish_plot(self.figure, self.ax, self.canvas)
 
     def plot_ubah(self):
         if self.close_prices is None:
@@ -376,7 +425,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         data_normed = data / data[0]
         ubah = data_normed.mean(1)
         line = self.ax.plot(ubah, label="UBAH", linewidth=0.9)
-        self.finish_plot()
+        self.finish_plot(self.figure, self.ax, self.canvas)
     
     def plot_ucrp(self):
         if self.close_prices is None:
@@ -391,7 +440,34 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         data_normed = data[1:] / data[:-1]
         ucrp = np.cumprod(data_normed.mean(1))
         line = self.ax.plot(ucrp, label="UCRP", linewidth=0.9)
-        self.finish_plot()
+        self.finish_plot(self.figure, self.ax, self.canvas)
+
+    def compute_sharpe(self, returns):
+        sharpes = []
+        for i in range(1, len(returns)):
+            data = returns[:i] - 1
+            sharpe = np.mean(data) / np.std(data)
+            sharpes.append(sharpe)
+        return np.array(sharpes)
+
+    def plot_sharpe(self):
+        agents_to_plot = self.get_agents_to_plot(self.actions_dict_sharpe)
+        fee = self.doubleSpinBoxSharpePlotFee.value()
+        start = self.spinBoxTickStart.value()
+        for agent in agents_to_plot:
+            turnover = np.array(self.agents_results[agent]["turnover"])
+            returns_with_fee = np.array(
+                self.agents_results[agent]["returns_no_fee"]) - turnover * fee
+            data = self.compute_sharpe(returns_with_fee)
+            line = self.ax_sharpe.plot(data[start:], label=agent, linewidth=0.9)
+            if self.checkBoxSharpePlotNoFee.isChecked():
+                data = self.compute_sharpe(
+                    np.array(self.agents_results[agent]["returns_no_fee"])
+                )
+                self.ax_sharpe.plot(data[start:], label=agent + ", no fee", 
+                        linewidth=0.9, linestyle='--', c=line[0]._color)
+        self.ax_sharpe.set_ylabel('Sharpe', size=6)
+        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe)
 
     def add_all_backtest_info(self, results):
         for res in results:
