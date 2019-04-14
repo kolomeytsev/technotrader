@@ -30,12 +30,12 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.backtest_results_windows = []
         self.backtest_analysis_columns = [
             "show", "run_id", "run_time", "name", "exchange",
-            "resolution", "begin", "end", "return", "sharpe", "turnover"
+            "resolution", "step", "begin", "end", "return", "sharpe", "turnover"
         ]
         self.backtest_analysis_columns_mapping = {
             name: i for i, name in enumerate(self.backtest_analysis_columns)
         }
-        self.data_type = None
+        self.data_type = "exchange"
 
     def make_size_settings(self):
         self.tableWidgetAddedAgents.setColumnWidth(0, 100)
@@ -55,10 +55,18 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.comboBoxCandlesResolution.addItems(candles_resolutions)
         self.comboBoxCandlesResolution.activated[str].connect(self.choose_candles_resolution)
 
+    def initialize_agents_params_types(self):
+        self.agent_params_types = {}
+        for agent, config in self.agents_configs.items():
+            self.agent_params_types[agent] = {}
+            for param_name, param_value in config.items():
+                self.agent_params_types[agent][param_name] = type(param_value).__name__
+
     def initialize_agents(self):
         agents_configs_path = "gui/default_agents_configs.json"
         with open(agents_configs_path) as f:
             self.agents_configs = json.load(f)
+        self.initialize_agents_params_types()
         all_items = ['']
         all_items.extend(list(self.agents_configs.keys()))
         self.comboBoxChooseAgent.addItems(all_items)
@@ -73,6 +81,30 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         self.pushButtonCompareBacktests.clicked.connect(self.compare_backtests)
         self.pushButtonOpenDataFile.clicked.connect(self.open_data_file)
 
+    def show_start_end_indices(self):
+        self.formLayout.removeWidget(self.dateTimeEditDataStart)
+        self.dateTimeEditDataStart.deleteLater()
+        self.dateTimeEditDataStart = None
+        self.formLayout.removeWidget(self.dateTimeEditBacktestStart)
+        self.dateTimeEditBacktestStart.deleteLater()
+        self.dateTimeEditBacktestStart = None
+        self.formLayout.removeWidget(self.dateTimeEditBacktestEnd)
+        self.dateTimeEditBacktestEnd.deleteLater()
+        self.dateTimeEditBacktestEnd = None
+
+        self.spinBoxDataStart = QtWidgets.QSpinBox(self.groupBoxBacktestParameters)
+        self.spinBoxDataStart.setMaximum(16777215)
+        self.spinBoxDataStart.setObjectName("spinBoxDataStart")
+        self.formLayout.setWidget(9, QtWidgets.QFormLayout.FieldRole, self.spinBoxDataStart)
+        self.spinBoxBacktestStart = QtWidgets.QSpinBox(self.groupBoxBacktestParameters)
+        self.spinBoxBacktestStart.setMaximum(16777215)
+        self.spinBoxBacktestStart.setObjectName("spinBoxBacktestStart")
+        self.formLayout.setWidget(10, QtWidgets.QFormLayout.FieldRole, self.spinBoxBacktestStart)
+        self.spinBoxBacktestEnd = QtWidgets.QSpinBox(self.groupBoxBacktestParameters)
+        self.spinBoxBacktestEnd.setMaximum(16777215)
+        self.spinBoxBacktestEnd.setObjectName("spinBoxBacktestEnd")
+        self.formLayout.setWidget(11, QtWidgets.QFormLayout.FieldRole, self.spinBoxBacktestEnd)
+
     def open_data_file(self):
         name = QtWidgets.QFileDialog.getOpenFileName(None, "Open File")
         print("name", name)
@@ -84,13 +116,19 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             self.data_name = name[0].split("/")[-1].split('.')[0]
             print(self.opened_data.shape)
             print(self.opened_data.head())
-            self.data_type = "csv"
-            self.comboBoxCandlesResolution.setEnabled(False)
-            self.spinBoxStep.setEnabled(False)
-            self.dateTimeEditDataStart.setEnabled(False)
-            self.dateTimeEditBacktestStart.setEnabled(False)
-            self.dateTimeEditBacktestEnd.setEnabled(False)
-            self.textEditInstruments.setText(str(", ".join(self.opened_data.columns)))
+            if self.data_type != "csv":
+                self.data_type = "csv"
+                self.comboBoxCandlesResolution.setEnabled(False)
+                self.spinBoxStep.setEnabled(False)
+                self.dateTimeEditDataStart.setEnabled(False)
+                self.dateTimeEditBacktestStart.setEnabled(False)
+                self.dateTimeEditBacktestEnd.setEnabled(False)
+                self.textEditInstruments.setText(str(", ".join(self.opened_data.columns)))
+                self.show_start_end_indices()
+                self.spinBoxBacktestStart.setValue(1)
+                self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
+            else:
+                self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
 
     def choose_agent(self):
         self.tableWidgetMainParameters.setRowCount(0)
@@ -120,11 +158,73 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         project_method = self.comboBoxProjectMethod.currentText()
         print("project_method chosen: %s" % project_method)
 
+    def show_start_end_dates(self):
+        self.formLayout.removeWidget(self.spinBoxDataStart)
+        self.spinBoxDataStart.deleteLater()
+        self.spinBoxDataStart = None
+        self.formLayout.removeWidget(self.spinBoxBacktestStart)
+        self.spinBoxBacktestStart.deleteLater()
+        self.spinBoxBacktestStart = None
+        self.formLayout.removeWidget(self.spinBoxBacktestEnd)
+        self.spinBoxBacktestEnd.deleteLater()
+        self.spinBoxBacktestEnd = None
+
+        _translate = QtCore.QCoreApplication.translate
+        self.dateTimeEditDataStart = QtWidgets.QDateTimeEdit(self.groupBoxBacktestParameters)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.dateTimeEditDataStart.sizePolicy().hasHeightForWidth())
+        self.dateTimeEditDataStart.setSizePolicy(sizePolicy)
+        self.dateTimeEditDataStart.setMinimumSize(QtCore.QSize(160, 0))
+        self.dateTimeEditDataStart.setDate(QtCore.QDate(2019, 2, 23))
+        self.dateTimeEditDataStart.setTimeSpec(QtCore.Qt.UTC)
+        self.dateTimeEditDataStart.setObjectName("dateTimeEditDataStart")
+        self.formLayout.setWidget(9, QtWidgets.QFormLayout.FieldRole, self.dateTimeEditDataStart)
+
+        self.dateTimeEditBacktestStart = QtWidgets.QDateTimeEdit(self.groupBoxBacktestParameters)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.dateTimeEditBacktestStart.sizePolicy().hasHeightForWidth())
+        self.dateTimeEditBacktestStart.setSizePolicy(sizePolicy)
+        self.dateTimeEditBacktestStart.setMinimumSize(QtCore.QSize(160, 0))
+        self.dateTimeEditBacktestStart.setDate(QtCore.QDate(2019, 2, 23))
+        self.dateTimeEditBacktestStart.setTimeSpec(QtCore.Qt.UTC)
+        self.dateTimeEditBacktestStart.setObjectName("dateTimeEditBacktestStart")
+        self.formLayout.setWidget(10, QtWidgets.QFormLayout.FieldRole, self.dateTimeEditBacktestStart)
+
+        self.dateTimeEditBacktestEnd = QtWidgets.QDateTimeEdit(self.groupBoxBacktestParameters)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.dateTimeEditBacktestEnd.sizePolicy().hasHeightForWidth())
+        self.dateTimeEditBacktestEnd.setSizePolicy(sizePolicy)
+        self.dateTimeEditBacktestEnd.setMinimumSize(QtCore.QSize(160, 0))
+        self.dateTimeEditBacktestEnd.setDate(QtCore.QDate(2019, 2, 23))
+        self.dateTimeEditBacktestEnd.setTimeSpec(QtCore.Qt.UTC)
+        self.dateTimeEditBacktestEnd.setObjectName("dateTimeEditBacktestEnd")
+        self.formLayout.setWidget(11, QtWidgets.QFormLayout.FieldRole, self.dateTimeEditBacktestEnd)
+        
+        self.dateTimeEditDataStart.setDisplayFormat(_translate("MainWindow", "yyyy-MM-dd HH:mm:ss"))
+        self.dateTimeEditBacktestStart.setDisplayFormat(_translate("MainWindow", "yyyy-MM-dd HH:mm:ss"))
+        self.dateTimeEditBacktestEnd.setDisplayFormat(_translate("MainWindow", "yyyy-MM-dd HH:mm:ss"))
+
     def choose_dataset(self):
         exchange_dataset = self.comboBoxDataset.currentText()
-        if len(exchange_dataset):
-            self.data_type = "exchange"
-        print("exchange_dataset chosen: %s" % exchange_dataset)
+        if self.data_type != "exchange":
+            if len(exchange_dataset):
+                print("exchange_dataset chosen: %s" % exchange_dataset)
+                self.data_type = "exchange"
+                self.labelOpenDataFile.setText('')
+                self.show_start_end_dates()
+                self.comboBoxCandlesResolution.setEnabled(True)
+                self.spinBoxStep.setEnabled(True)
+                #self.dateTimeEditDataStart.setEnabled(True)
+                #self.dateTimeEditBacktestStart.setEnabled(True)
+                #self.dateTimeEditBacktestEnd.setEnabled(True)
+                self.textEditInstruments.setText(str(''))
+                
 
     def choose_candles_resolution(self):
         self.spinBoxStep.clear()
@@ -135,12 +235,13 @@ class TechnoTraderMainWindow(Ui_MainWindow):
     def file_open(self):
         name = QtWidgets.QFileDialog.getExistingDirectory(None, "Open Directory")
         self.textEditOpenResults.setText(name)
-        for file in os.listdir(name):
-            if file.startswith("backtest_"):
-                with open(name + '/' + file) as f:
-                    results = json.load(f)
-                    self.add_backtest_result(results)
-                    self.results_dict[int(file.split('_')[1].split('.')[0])] = results
+        if len(name):
+            for file in os.listdir(name):
+                if file.startswith("backtest_"):
+                    with open(name + '/' + file) as f:
+                        results = json.load(f)
+                        self.add_backtest_result(results)
+                        self.results_dict[int(file.split('_')[1].split('.')[0])] = results
 
     def process_menu_actions(self):
         self.actionQuit.setShortcut("Ctrl+Q")
@@ -200,7 +301,10 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             print(param_value)
             param_value = param_value.replace("'", '"').replace("None", "null")
             param_value = param_value.replace("True", "true").replace("False", "false")
-            config_main[param_name] = json.loads(param_value)
+            if self.agent_params_types[agent_class][param_name] == "str":
+                config_main[param_name] = param_value
+            else:
+                config_main[param_name] = json.loads(param_value)
         return config_main, config_other
 
     def edit_row(self, row_index):
@@ -381,8 +485,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         print("instruments_list", instruments_list)
         data_config = {
             "data_name": self.data_name,
-            "begin":  0,
-            "end":  self.opened_data.shape[0],
+            "begin":  self.spinBoxDataStart.value(),
+            "end":  self.spinBoxBacktestEnd.value(),
             "step": 1,
             "candles_res": "period",
             "candles_res_sec": 1,
@@ -392,8 +496,8 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         }
         data_shift = 10
         backtest_config = {
-            "begin":  data_shift,
-            "end":  self.opened_data.shape[0],
+            "begin":  self.spinBoxBacktestStart.value(),
+            "end":  self.spinBoxBacktestEnd.value(),
             "step": 1,
             "fee": self.doubleSpinBoxFee.value(),
             "exchange": self.data_name,
@@ -499,6 +603,7 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             "name": name,
             "exchange": results["backtest_config"]["exchange"],
             "resolution": results["backtest_config"]["candles_res"],
+            "step": results["backtest_config"]["step"],
             "begin": convert_time_to_str(results["backtest_config"]["begin"]),
             "end": convert_time_to_str(results["backtest_config"]["end"]),
             "return": final_return,

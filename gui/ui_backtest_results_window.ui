@@ -103,7 +103,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>322</width>
-                 <height>360</height>
+                 <height>373</height>
                 </rect>
                </property>
                <layout class="QFormLayout" name="formLayout_5">
@@ -792,6 +792,11 @@
               <column>
                <property name="text">
                 <string>Resolution</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Step</string>
                </property>
               </column>
               <column>

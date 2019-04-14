@@ -5,6 +5,7 @@ import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 import datetime
+import copy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -42,7 +43,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.display_agents_metrics()
         self.pushButtonPlot.clicked.connect(self.plot)
         self.pushButtonSharpePlot.clicked.connect(self.plot_sharpe)
-        #self.pushButtonPlot.clicked.connect(self.plot)
+        self.pushButtonWeightsPlot.clicked.connect(self.plot_weights)
         self.pushButtonComputeMetrics.clicked.connect(self.display_agents_metrics)
         self.pushButtonPlotInstruments.clicked.connect(self.plot_instruments)
         self.pushButtonClearPlot.clicked.connect(self.clear_plot_returns)
@@ -54,7 +55,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
     def add_table_columns(self):
         self.backtest_info_columns = [
             "run_id", "run_time", "name", "exchange", 
-            "resolution", "begin", "end", 
+            "resolution", "step", "begin", "end", 
             "return", "sharpe", "turnover", "instruments"
         ]
         self.backtest_info_columns_mapping = {name: i for i, name in enumerate(self.backtest_info_columns)}
@@ -66,7 +67,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.agent_info_columns_mapping = {name: i for i, name in enumerate(self.agent_info_columns)}
         self.tableWidgetAgentsInfo.setColumnWidth(self.agent_info_columns_mapping["parameters"], 1000)
 
-    def get_all_instrument(self, results):
+    def get_all_instruments(self, results):
         all_instruments_list = set()
         for res in results:
             all_instruments_list.union(res["data_config"]["instruments_list"])
@@ -101,7 +102,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.data_type = results[0]["data_config"]["type"]
             else:
                 self.data_type = "exchange"
-            self.instruments_list = self.get_all_instrument(results)
+            self.instruments_list = self.get_all_instruments(results)
             self.begin_epoch = min([r["backtest_config"]["begin"] for r in results])
             self.end_epoch = max([r["backtest_config"]["end"] for r in results])
             self.agents_results = self.gather_agent_results(results)
@@ -174,6 +175,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.verticalLayoutWeights.addWidget(self.canvas_weights)
         self.verticalLayoutWeights.addWidget(self.toolbar_weights)
         self.clear_plot_weights()
+        #self.plot_weights()
 
     def instruments_toolbar(self):
         plot_instruments = ["all"]
@@ -229,11 +231,16 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.actions_dict = self.initialize_agents_choice_box(self.toolbutton_returns)
         self.formLayout_5.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolbutton_returns)
         self.actions_dict_sharpe = self.initialize_agents_choice_box(self.toolbuttonAgentsSharpe)
+        self.actions_dict_weights = self.initialize_agents_choice_box(self.toolButtonWeightsAgents)
 
         self.comboBoxPlotType.addItems(self.plot_types)
         self.comboBoxPlotType.activated[str].connect(self.choose_plot_type)
         self.comboBoxLegend.addItems(self.legend_positions)
         self.comboBoxLegend.activated[str].connect(self.choose_legend_position)
+        self.comboBoxSharpeLegend.addItems(self.legend_positions)
+        self.comboBoxLegend.activated[str].connect(self.choose_legend_position_sharpe)
+        self.comboBoxWeightsLegend.addItems(self.legend_positions)
+        self.comboBoxLegend.activated[str].connect(self.choose_legend_position_weights)
 
     def get_number_of_trading_days(self):
         if self.data_type == "exchange":
@@ -305,18 +312,26 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         plot_type = self.comboBoxLegend.currentText()
         print("legend position chosen: %s" % plot_type)
 
-    def plot_legend(self, ax):
-        if self.comboBoxLegend.currentText() == "bottom":
+    def choose_legend_position_sharpe(self):
+        plot_type = self.comboBoxSharpeLegend.currentText()
+        print("legend sharpe position chosen: %s" % plot_type)
+
+    def choose_legend_position_weights(self):
+        plot_type = self.comboBoxWeightsLegend.currentText()
+        print("legend weights position chosen: %s" % plot_type)
+
+    def plot_legend(self, ax, legend_position):
+        if legend_position == "bottom":
             box = ax.get_position()
             ax.set_position([box.x0, box.y0 + box.height * 0.1,
                              box.width, box.height * 0.9])
             ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
                     ncol=5, prop={"size": 5})
-        elif self.comboBoxLegend.currentText() == "right":
+        elif legend_position == "right":
             box = ax.get_position()
             ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
             ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={"size": 5})
-        elif self.comboBoxLegend.currentText() == "no":
+        elif legend_position == "no":
             pass
         else:
             raise ValueError("Wrong comboBoxLegend value")
@@ -354,25 +369,30 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         self.figure.clear()
         self.ax = self.figure.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
-        self.finish_plot(self.figure, self.ax, self.canvas)
+        legend_pos = self.comboBoxLegend.currentText()
+        self.finish_plot(self.figure, self.ax, self.canvas, legend_pos)
         #self.clear_flag = True
 
     def clear_plot_sharpe(self):
         self.figure_sharpe.clear()
         self.ax_sharpe = self.figure_sharpe.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
-        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe)
+        legend_pos = self.comboBoxSharpeLegend.currentText()
+        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe, legend_pos)
 
     def clear_plot_weights(self):
         self.figure_weights.clear()
         self.ax_weights = self.figure_weights.add_subplot(111)
         plt.rcParams.update({'font.size': 10})
-        self.finish_plot(self.figure_weights, self.ax_weights, self.canvas_weights)
+        legend_pos = self.comboBoxWeightsLegend.currentText()
+        self.finish_plot(self.figure_weights, self.ax_weights, 
+                        self.canvas_weights, legend_pos, False)
 
-    def finish_plot(self, figure, ax, canvas):
+    def finish_plot(self, figure, ax, canvas, legend_position, grid_flag=True):
         figure.tight_layout()
-        self.plot_legend(ax)
-        ax.grid(color='lightgray', linestyle='dashed')
+        self.plot_legend(ax, legend_position)
+        if grid_flag:
+            ax.grid(color='lightgray', linestyle='dashed')
         for tick in ax.xaxis.get_major_ticks():
             tick.label.set_fontsize(4)
         for tick in ax.yaxis.get_major_ticks():
@@ -399,7 +419,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.ax.plot(data, label=agent + ", no fee", 
                         linewidth=0.9, linestyle='--', c=line[0]._color)
         self.ax.set_ylabel('Returns', size=6)
-        self.finish_plot(self.figure, self.ax, self.canvas)
+        legend_pos = self.comboBoxLegend.currentText()
+        self.finish_plot(self.figure, self.ax, self.canvas, legend_pos)
 
     def plot_instruments(self):
         if self.close_prices is None:
@@ -410,7 +431,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             if self.checkBoxNormalized.isChecked():
                 data /= data[0]
             line = self.ax.plot(data, label=instrument, linewidth=0.9)
-        self.finish_plot(self.figure, self.ax, self.canvas)
+        legend_pos = self.comboBoxLegend.currentText()
+        self.finish_plot(self.figure, self.ax, self.canvas, legend_pos)
 
     def plot_ubah(self):
         if self.close_prices is None:
@@ -425,7 +447,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         data_normed = data / data[0]
         ubah = data_normed.mean(1)
         line = self.ax.plot(ubah, label="UBAH", linewidth=0.9)
-        self.finish_plot(self.figure, self.ax, self.canvas)
+        legend_pos = self.comboBoxLegend.currentText()
+        self.finish_plot(self.figure, self.ax, self.canvas, legend_pos)
     
     def plot_ucrp(self):
         if self.close_prices is None:
@@ -440,7 +463,8 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         data_normed = data[1:] / data[:-1]
         ucrp = np.cumprod(data_normed.mean(1))
         line = self.ax.plot(ucrp, label="UCRP", linewidth=0.9)
-        self.finish_plot(self.figure, self.ax, self.canvas)
+        legend_pos = self.comboBoxLegend.currentText()
+        self.finish_plot(self.figure, self.ax, self.canvas, legend_pos)
 
     def compute_sharpe(self, returns):
         sharpes = []
@@ -467,7 +491,40 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
                 self.ax_sharpe.plot(data[start:], label=agent + ", no fee", 
                         linewidth=0.9, linestyle='--', c=line[0]._color)
         self.ax_sharpe.set_ylabel('Sharpe', size=6)
-        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe)
+        legend_pos = self.comboBoxSharpeLegend.currentText()
+        self.finish_plot(self.figure_sharpe, self.ax_sharpe, self.canvas_sharpe, legend_pos)
+
+    def get_agents_instruments(self, agents_to_plot):
+        all_instruments_list = set()
+        for agent in agents_to_plot:
+            instruments = self.agents_results[agent]["config"]["instruments_list"]
+            all_instruments_list |= set(instruments)
+        return sorted(all_instruments_list)
+
+    def plot_weights(self):
+        self.figure_weights.tight_layout()
+        agents_to_plot = self.get_agents_to_plot(self.actions_dict_weights)
+        instruments = self.get_agents_instruments(agents_to_plot)
+        instruments.append("Risk Free")
+        y_pos = np.arange(len(instruments))
+        bar_width = 0.9 / len(agents_to_plot)
+        for agent_number, agent in enumerate(agents_to_plot):
+            mean_weights = np.array(self.agents_results[agent]["weights"]).mean(0)
+            weights_dict = {x: 0 for x in instruments}
+            agents_instruments = self.agents_results[agent]["config"]["instruments_list"]
+            for i, instr in enumerate(agents_instruments):
+                weights_dict[instr] = mean_weights[i]
+            if len(mean_weights) == len(agents_instruments) + 1:
+                weights_dict["Risk Free"] = mean_weights[-1]
+            weights = [weights_dict[x] for x in instruments]
+            self.ax_weights.bar(y_pos + agent_number * bar_width,
+                                weights, bar_width, label=agent)
+        self.ax_weights.set_xticks(y_pos + len(agents_to_plot) * bar_width / 2 - bar_width / 2)
+        self.ax_weights.set_xticklabels(instruments, rotation=90)
+        self.ax_weights.set_ylabel('Mean weight', size=6)
+        legend_pos = self.comboBoxWeightsLegend.currentText()
+        self.finish_plot(self.figure_weights, self.ax_weights,
+                        self.canvas_weights, legend_pos, False)
 
     def add_all_backtest_info(self, results):
         for res in results:
@@ -484,7 +541,11 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         widget.setText(str(agent))
         self.tableWidgetAgentsInfo.setCellWidget(numRows, 1, widget)
         widget = QtWidgets.QLabel()
-        widget.setText(str(agents_result["config"]))
+        config = copy.deepcopy(agents_result["config"])
+        for x in ["instruments_list", "exchange", "candles_res", "step"]:
+            if config.get(x) is not None:
+                del config[x]
+        widget.setText(str(config))
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setWidget(widget)
         self.tableWidgetAgentsInfo.setCellWidget(numRows, 2, scroll_area)
@@ -513,6 +574,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             "name": name,
             "exchange": results["backtest_config"]["exchange"],
             "resolution": results["backtest_config"]["candles_res"],
+            "step": results["backtest_config"]["step"],
             "begin": convert_time_to_str(results["backtest_config"]["begin"]),
             "end": convert_time_to_str(results["backtest_config"]["end"]),
             "return": final_return,

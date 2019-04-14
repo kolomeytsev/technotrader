@@ -552,6 +552,23 @@
                </property>
               </widget>
              </item>
+             <item row="2" column="0">
+              <widget class="QPushButton" name="pushButtonOpenDataFile">
+               <property name="text">
+                <string>Open Data File</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="labelOpenDataFile">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
              <item row="3" column="0">
               <widget class="QLabel" name="labelInstruments">
                <property name="font">
@@ -717,7 +734,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>24</day>
+                 <day>23</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -758,7 +775,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>24</day>
+                 <day>23</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -799,7 +816,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>24</day>
+                 <day>23</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -820,23 +837,6 @@
                </property>
                <property name="text">
                 <string>Run Backtest</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QPushButton" name="pushButtonOpenDataFile">
-               <property name="text">
-                <string>Open Data File</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="labelOpenDataFile">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string/>
                </property>
               </widget>
              </item>
@@ -1014,6 +1014,11 @@
               <column>
                <property name="text">
                 <string>Resolution</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Step</string>
                </property>
               </column>
               <column>

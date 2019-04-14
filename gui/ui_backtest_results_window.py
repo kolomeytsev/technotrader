@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'backtest_results_window.ui'
+# Form implementation generated from reading ui file 'ui_backtest_results_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -45,7 +45,7 @@ class Ui_FormPlot(object):
         self.scrollAreaParameters.setWidgetResizable(True)
         self.scrollAreaParameters.setObjectName("scrollAreaParameters")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 322, 360))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 322, 373))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.formLayout_5 = QtWidgets.QFormLayout(self.scrollAreaWidgetContents)
         self.formLayout_5.setObjectName("formLayout_5")
@@ -345,7 +345,7 @@ class Ui_FormPlot(object):
         self.verticalLayout_8.setObjectName("verticalLayout_8")
         self.tableWidgetGeneralInfo = QtWidgets.QTableWidget(self.groupBoxGeneralInfo)
         self.tableWidgetGeneralInfo.setObjectName("tableWidgetGeneralInfo")
-        self.tableWidgetGeneralInfo.setColumnCount(11)
+        self.tableWidgetGeneralInfo.setColumnCount(12)
         self.tableWidgetGeneralInfo.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidgetGeneralInfo.setHorizontalHeaderItem(0, item)
@@ -369,6 +369,8 @@ class Ui_FormPlot(object):
         self.tableWidgetGeneralInfo.setHorizontalHeaderItem(9, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidgetGeneralInfo.setHorizontalHeaderItem(10, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidgetGeneralInfo.setHorizontalHeaderItem(11, item)
         self.tableWidgetGeneralInfo.horizontalHeader().setDefaultSectionSize(100)
         self.verticalLayout_8.addWidget(self.tableWidgetGeneralInfo)
         self.groupBoxAgentsInfo = QtWidgets.QGroupBox(self.splitter_4)
@@ -471,16 +473,18 @@ class Ui_FormPlot(object):
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(4)
         item.setText(_translate("FormPlot", "Resolution"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(5)
-        item.setText(_translate("FormPlot", "Begin"))
+        item.setText(_translate("FormPlot", "Step"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(6)
-        item.setText(_translate("FormPlot", "End"))
+        item.setText(_translate("FormPlot", "Begin"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(7)
-        item.setText(_translate("FormPlot", "Return"))
+        item.setText(_translate("FormPlot", "End"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(8)
-        item.setText(_translate("FormPlot", "Sharpe"))
+        item.setText(_translate("FormPlot", "Return"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(9)
-        item.setText(_translate("FormPlot", "Turnover"))
+        item.setText(_translate("FormPlot", "Sharpe"))
         item = self.tableWidgetGeneralInfo.horizontalHeaderItem(10)
+        item.setText(_translate("FormPlot", "Turnover"))
+        item = self.tableWidgetGeneralInfo.horizontalHeaderItem(11)
         item.setText(_translate("FormPlot", "Instruments"))
         self.groupBoxAgentsInfo.setTitle(_translate("FormPlot", "Agents Info"))
         item = self.tableWidgetAgentsInfo.horizontalHeaderItem(0)

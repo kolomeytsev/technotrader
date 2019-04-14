@@ -76,4 +76,6 @@ class DataLoader:
         return result
 
     def get_data(self, epochs):
+        if any([x < 0 for x in epochs]):
+            raise ValueError("epoch must be positive")
         return {epoch: self.data[epoch] for epoch in epochs}
