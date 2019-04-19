@@ -109,26 +109,26 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         name = QtWidgets.QFileDialog.getOpenFileName(None, "Open File")
         print("name", name)
         self.labelOpenDataFile.setText(name[0].split("/")[-1])
-        if name[0].split(".")[-1].lower() != "csv":
-            self.show_error("File must be in csv format!")
+        #if name[0].split(".")[-1].lower() != "csv":
+        #    self.show_error("File must be in csv format!")
+        #else:
+        self.opened_data = pd.read_csv(name[0])
+        self.data_name = name[0].split("/")[-1].split('.')[0]
+        print(self.opened_data.shape)
+        print(self.opened_data.head())
+        if self.data_type != "csv":
+            self.data_type = "csv"
+            self.comboBoxCandlesResolution.setEnabled(False)
+            self.spinBoxStep.setEnabled(False)
+            self.dateTimeEditDataStart.setEnabled(False)
+            self.dateTimeEditBacktestStart.setEnabled(False)
+            self.dateTimeEditBacktestEnd.setEnabled(False)
+            self.textEditInstruments.setText(str(", ".join(self.opened_data.columns)))
+            self.show_start_end_indices()
+            self.spinBoxBacktestStart.setValue(1)
+            self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
         else:
-            self.opened_data = pd.read_csv(name[0])
-            self.data_name = name[0].split("/")[-1].split('.')[0]
-            print(self.opened_data.shape)
-            print(self.opened_data.head())
-            if self.data_type != "csv":
-                self.data_type = "csv"
-                self.comboBoxCandlesResolution.setEnabled(False)
-                self.spinBoxStep.setEnabled(False)
-                self.dateTimeEditDataStart.setEnabled(False)
-                self.dateTimeEditBacktestStart.setEnabled(False)
-                self.dateTimeEditBacktestEnd.setEnabled(False)
-                self.textEditInstruments.setText(str(", ".join(self.opened_data.columns)))
-                self.show_start_end_indices()
-                self.spinBoxBacktestStart.setValue(1)
-                self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
-            else:
-                self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
+            self.spinBoxBacktestEnd.setValue(self.opened_data.shape[0])
 
     def choose_agent(self):
         self.tableWidgetMainParameters.setRowCount(0)
@@ -468,13 +468,16 @@ class TechnoTraderMainWindow(Ui_MainWindow):
         return backtest_id
 
     def run_backtest(self):
-        if self.data_type is None:
-            self.show_error("Pick Exchange or Dataset!")
-            return
-        if self.data_type == "exchange":
-            self.run_backtest_exchange()
-        else:
-            self.run_backtest_data_file()
+        try:
+            if self.data_type is None:
+                self.show_error("Pick Exchange or Dataset!")
+                return
+            if self.data_type == "exchange":
+                self.run_backtest_exchange()
+            else:
+                self.run_backtest_data_file()
+        except Exception as e:
+            self.show_error(str(e))
 
     def run_backtest_data_file(self):
         instruments = self.textEditInstruments.toPlainText()
