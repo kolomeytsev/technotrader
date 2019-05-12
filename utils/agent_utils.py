@@ -159,15 +159,18 @@ class WeightsProjection:
     def top_projection(self, weights, top_amount=1, min_value=0, max_value=1):
         indices_sorted = weights.argsort()
         indices_long = indices_sorted[-self.top_amount:]
-        indices_short = indices_sorted[:self.top_amount]
         weights_long = weights[indices_long]
-        weights_short = weights[indices_short]
+        if self.short_flag:
+            indices_short = indices_sorted[:self.top_amount]
+            weights_short = weights[indices_short]
         if self.neutralize_flag:
             weights_long /= weights_long.sum()
-            weights_short /= np.abs(weights_short).sum()
+            if self.short_flag:
+                weights_short /= np.abs(weights_short).sum()
         final_weights = np.zeros(weights.shape[0])
         final_weights[indices_long] = weights_long
-        final_weights[indices_short] = weights_short
+        if self.short_flag:
+            final_weights[indices_short] = weights_short
         return final_weights / np.abs(final_weights).sum()
 
     def uniform_projection(self, weights, min_value=0, max_value=1):

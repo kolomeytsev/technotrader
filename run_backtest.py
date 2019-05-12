@@ -49,6 +49,8 @@ def parse_parameters():
     parser.add_argument('--parallel', action='store_const', 
                         const=True, default=False,
                         help='parallel computing (True/False)')
+    parser.add_argument('-s', '--processes', default=3, type=int,
+                        help='number of processes in parallel (default=4)')
     args = parser.parse_args()
     return args
 
@@ -296,14 +298,18 @@ def run_backtest(backtester):
 
 
 def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
-                        args=None, path=None, parallel=False):
+                        args=None, path=None, parallel=False, processes_number=3):
     backtesters_list = []
     for agent_class, agent_config in agent_configs:
         agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
         backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
         backtesters_list.append(backtester)
     if parallel:
-        pool = Pool(multiprocessing.cpu_count() - 1)
+        if args is not None:
+            processes_num = args.processes
+        else:
+            processes_num = processes_number
+        pool = Pool(processes_num)
         results = pool.map(run_backtest, backtesters_list)
     else:
         results = list(map(run_backtest, backtesters_list))
