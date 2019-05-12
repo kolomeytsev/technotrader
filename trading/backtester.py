@@ -66,23 +66,27 @@ class BackTester(Trader):
         return future_price_relatives
 
     def execute_trades(self, weights):
+        assert np.abs(1 - np.abs(weights).sum()) < 1e-6, "sum of abs weights is not 1"
         if self.steps % self.log_frequency == 0:
             logging.info("the step is {}".format(self.steps))
         logging.debug("the raw weights is {}".format(weights))
         future_price_relatives = self.get_future_price_relatives(self.current_epoch)
         future_price_relatives = np.concatenate((future_price_relatives, np.ones(1)))
-        pv_after_commission = calculate_pv_after_commission(
+        returns_shifted = future_price_relatives - 1
+
+        turnover = np.abs(weights - self.last_weights_raw).sum()
+        portfolio_change_no_fee = np.dot(weights, returns_shifted) + 1
+        portfolio_change = portfolio_change_no_fee - turnover * self.commission_rate
+        """pv_after_commission = calculate_pv_after_commission(
             weights,
             self.last_weights,
             self.commission_rate
         )
-        turnover = np.abs(weights - self.last_weights_raw).sum()
-        portfolio_change_no_fee = np.dot(weights, future_price_relatives)
         portfolio_change = portfolio_change_no_fee * pv_after_commission
         self.total_capital *= portfolio_change
         self.last_weights = pv_after_commission * weights * \
                            future_price_relatives / \
-                           portfolio_change
+                           portfolio_change"""
         self.last_weights_raw = weights.copy()
         logging.debug(
             "the portfolio change this period is : {}".format(portfolio_change)
