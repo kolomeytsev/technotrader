@@ -75,7 +75,8 @@ LIST_PARAMS = ["instruments_list", "price_label"]
 
 LIST_PARAMS_DICT = {
     "bmar2": ["alphas"],
-    "rl": ["layers"]
+    "rl": ["layers"],
+    "crp": ["weights"]
 }
 
 TRADING_DAYS_NUMBER = {

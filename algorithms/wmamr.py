@@ -4,7 +4,7 @@ from technotrader.trading.agent import Agent
 import technotrader.utils.agent_utils as agent_utils
 
 
-class WmamrBlock(Block):
+class WmamrAgent(Agent):
     def __init__(self, config, data_loader, trade_log=None):
         super().__init__(config, data_loader)        
         self.simplex_projection = agent_utils.simplex_projection        
@@ -62,12 +62,13 @@ class WmamrBlock(Block):
     def compute_portfolio(self, epoch):
         self.n_steps += 1
         data_price_relatives = self.data_extractor(epoch)
-        self.update_lagrange_multiplier(data_price_relatives.mean(0))
+        data_price_relatives_mean = data_price_relatives.mean(0)
+        self.update_lagrange_multiplier(data_price_relatives_mean)
 
         if self.n_steps == 1:
             day_weight = self.np.ones(self.instruments_number) / self.instruments_number
         else:   
-            day_weight = self.pamr_expert(data_price_relatives[-1])
+            day_weight = self.pamr_expert(data_price_relatives_mean)
             bt_return = results('backtest', [epoch - self.step])
             daily_ret = bt_return['return_fee'].values[0]
             

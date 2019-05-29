@@ -4,7 +4,7 @@ from technotrader.trading.agent import Agent
 import technotrader.utils.agent_utils as agent_utils
 
 
-class PamrBlock(Block):
+class PamrAgent(Agent):
     """
     Passive Aggressive Mean Reversion strategy.
 

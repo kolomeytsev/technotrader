@@ -16,7 +16,7 @@ class CrpAgent(Agent):
         self.n_inst = len(self.instruments_list)
         self.exchange = config['exchange']
         if config["weights"] is not None:
-            self.weights = config["weights"]
+            self.weights = np.array(config["weights"])
         else:
             print("using uniform weights")
             self.weights = np.ones(self.n_inst) / self.n_inst
@@ -24,7 +24,7 @@ class CrpAgent(Agent):
                 self.weights *= -1
         self.preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
-            self.preds_dict[instrument] = self.weights[i]
+            self.preds_dict[instrument] = float(self.weights[i])
 
     def compute_portfolio(self, epoch):
         print("crp epoch:", datetime.datetime.fromtimestamp(epoch))

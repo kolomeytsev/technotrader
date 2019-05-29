@@ -22,8 +22,8 @@ class RmrTrendFollowAgent(Agent):
         self.down_trend_threshold = config["down_trend_threshold"]
 
         self.n_inst = len(self.instruments_list)
-        if use_risk_free:
-            self.n_inst += 1
+        #if use_risk_free:
+        #    self.n_inst += 1
         self.last_portfolio = np.ones(self.n_inst) / self.n_inst
         self.compute_L1_median = agent_utils.compute_L1_median
         self.weights_projection = agent_utils.WeightsProjection(config)

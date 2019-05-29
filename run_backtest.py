@@ -252,7 +252,8 @@ def read_configs(args):
 def save_results_df(backtesters_results, path):
     print("saving results")
     results = {}
-    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs \
+    print(backtesters_results)
+    for agent_class, agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs \
             in backtesters_results:
         results[agent_name + "_returns_no_fee"] = test_pc_vector_no_fee
         results[agent_name + "_returns_with_fee"] = test_pc_vector
@@ -262,7 +263,8 @@ def save_results_df(backtesters_results, path):
     df.to_csv(path, index=False)
 
 
-def save_results(backtesters_results, data_config, agent_configs, backtest_config, path):
+def save_results(backtesters_results, data_config, agent_configs, 
+                backtest_config, path, agent_name_to_config):
     print("saving results")
     results = {
         "data_config": data_config,
@@ -270,7 +272,7 @@ def save_results(backtesters_results, data_config, agent_configs, backtest_confi
         "agents": {}
     }
     agent_configs_dict = dict(agent_configs)
-    for agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs, weights \
+    for agent_class, agent_name, test_pc_vector_no_fee, test_pc_vector, test_turnover_vector, epochs, weights \
             in backtesters_results:
         results["agents"][agent_name] = {}
         results["agents"][agent_name]["returns_no_fee"] = list(test_pc_vector_no_fee)
@@ -278,7 +280,7 @@ def save_results(backtesters_results, data_config, agent_configs, backtest_confi
         results["agents"][agent_name]["turnover"] = list(test_turnover_vector)
         results["agents"][agent_name]["weights"] = weights
         results["agents"][agent_name]["epochs"] = list(epochs)
-        results["agents"][agent_name]["config"] = agent_configs_dict[agent_name]
+        results["agents"][agent_name]["config"] = agent_name_to_config[agent_name]
     with open(path, "w") as f:
         json.dump(results, f)
     return results
@@ -287,6 +289,7 @@ def save_results(backtesters_results, data_config, agent_configs, backtest_confi
 def run_backtest(backtester):
     backtester.run()
     results = (
+        backtester.agent.config["agent_class"],
         backtester.agent.config["agent_name"],
         backtester.test_pc_vector_no_fee,
         backtester.test_pc_vector,
@@ -300,7 +303,9 @@ def run_backtest(backtester):
 def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
                         args=None, path=None, parallel=False, processes_number=3):
     backtesters_list = []
+    agent_name_to_config = {}
     for agent_class, agent_config in agent_configs:
+        agent_name_to_config[agent_config["agent_name"]] = agent_config
         agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
         backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
         backtesters_list.append(backtester)
@@ -314,7 +319,8 @@ def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
     else:
         results = list(map(run_backtest, backtesters_list))
     if path is not None:
-        results = save_results(results, data_config, agent_configs, backtest_config, path)
+        results = save_results(results, data_config, agent_configs, 
+                                backtest_config, path, agent_name_to_config)
     return results
 
 
