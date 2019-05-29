@@ -117,7 +117,7 @@
                 <item row="1" column="0">
                  <widget class="QLabel" name="labelPlotFee">
                   <property name="text">
-                   <string>Fee (%):</string>
+                   <string>Fee:</string>
                   </property>
                  </widget>
                 </item>
@@ -130,7 +130,7 @@
                    </size>
                   </property>
                   <property name="decimals">
-                   <number>4</number>
+                   <number>5</number>
                   </property>
                   <property name="singleStep">
                    <double>0.000100000000000</double>
@@ -150,7 +150,7 @@
                 <item row="3" column="0">
                  <widget class="QLabel" name="labelPlotNoFee">
                   <property name="text">
-                   <string>Plot No Fee</string>
+                   <string>Plot No Fee:</string>
                   </property>
                  </widget>
                 </item>
@@ -792,11 +792,6 @@
               <column>
                <property name="text">
                 <string>Resolution</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Step</string>
                </property>
               </column>
               <column>

@@ -217,19 +217,46 @@
                <property name="minimumSize">
                 <size>
                  <width>150</width>
-                 <height>0</height>
+                 <height>200</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>205</height>
+                 <height>370</height>
                 </size>
                </property>
                <property name="title">
                 <string>Other Parameters</string>
                </property>
                <layout class="QFormLayout" name="formLayout_2">
+                <property name="leftMargin">
+                 <number>3</number>
+                </property>
+                <property name="topMargin">
+                 <number>3</number>
+                </property>
+                <property name="rightMargin">
+                 <number>3</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>3</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="labelAgentsName">
+                  <property name="font">
+                   <font>
+                    <pointsize>15</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Agent's Name:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEditAgentsName"/>
+                </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="labelPriceLabel">
                   <property name="font">
@@ -252,67 +279,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="labelUseRiskFree">
-                  <property name="font">
-                   <font>
-                    <pointsize>15</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Use Risk Free:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QCheckBox" name="checkBoxUseRiskFree">
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="labelUseShorts">
-                  <property name="font">
-                   <font>
-                    <pointsize>15</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Use Shorts:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QCheckBox" name="checkBoxUseShorts">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
                 <item row="4" column="0">
-                 <widget class="QLabel" name="labelUseNeutralization">
-                  <property name="font">
-                   <font>
-                    <pointsize>15</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Use Neutralization:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QCheckBox" name="checkUseNeutralization">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
                  <widget class="QLabel" name="labelProjectMethod">
                   <property name="font">
                    <font>
@@ -324,7 +291,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
+                <item row="4" column="1">
                  <widget class="QComboBox" name="comboBoxProjectMethod">
                   <property name="minimumSize">
                    <size>
@@ -334,7 +301,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="0">
+                <item row="5" column="0">
                  <widget class="QLabel" name="labelTopAmount">
                   <property name="font">
                    <font>
@@ -346,7 +313,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
+                <item row="5" column="1">
                  <widget class="QSpinBox" name="spinBoxTopAmount">
                   <property name="minimumSize">
                    <size>
@@ -362,20 +329,97 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="labelAgentsName">
-                  <property name="font">
-                   <font>
-                    <pointsize>15</pointsize>
-                   </font>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="checkUseNeutralization">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
                   </property>
                   <property name="text">
-                   <string>Agent's Name:</string>
+                   <string>Use Neutralization:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEditAgentsName"/>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="checkBoxUseShorts">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
+                  <property name="text">
+                   <string>Use Shorts:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0" colspan="2">
+                 <widget class="QGroupBox" name="groupBoxTrendTracking">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>100</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Trend Tracking</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_3">
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="labelThreshold">
+                     <property name="text">
+                      <string>Threshold:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1" colspan="2">
+                    <widget class="QSpinBox" name="spinBoxDowntrendThreshold"/>
+                   </item>
+                   <item row="2" column="1" colspan="2">
+                    <widget class="QSpinBox" name="spinBoxWindowLong">
+                     <property name="maximum">
+                      <number>900000</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="labelWindowLong">
+                     <property name="text">
+                      <string>Window Long:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="labelWindowShort">
+                     <property name="text">
+                      <string>Window Short:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1" colspan="2">
+                    <widget class="QSpinBox" name="spinBoxWindowShort"/>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QCheckBox" name="checkBoxTrendTracking">
+                     <property name="layoutDirection">
+                      <enum>Qt::RightToLeft</enum>
+                     </property>
+                     <property name="text">
+                      <string>Enable Trend Tracking:</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QCheckBox" name="checkBoxUseRiskFree">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
+                  <property name="text">
+                   <string>Use Risk Free:</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -385,7 +429,7 @@
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>50</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="text">
@@ -629,14 +673,14 @@
                 </font>
                </property>
                <property name="text">
-                <string>Fee (%):</string>
+                <string>Fee:</string>
                </property>
               </widget>
              </item>
              <item row="6" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBoxFee">
                <property name="decimals">
-                <number>4</number>
+                <number>5</number>
                </property>
                <property name="singleStep">
                 <double>0.000100000000000</double>
@@ -717,7 +761,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>22</day>
+                 <day>21</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -758,7 +802,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>22</day>
+                 <day>21</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -799,7 +843,7 @@
                 <date>
                  <year>2019</year>
                  <month>2</month>
-                 <day>22</day>
+                 <day>21</day>
                 </date>
                </property>
                <property name="displayFormat">
@@ -1054,14 +1098,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tabRL">
        <attribute name="title">
         <string>Reinforcement Learning </string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Quick Expressions</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tabLiveTrading">

@@ -106,5 +106,6 @@ ENV/
 
 database/
 backtest_results/
+backtest_results*
 
 .DS_Store
