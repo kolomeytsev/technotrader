@@ -25,6 +25,7 @@ class RmrAgent(Agent):
             price_relatives_flag = config["price_relatives_flag"]
         else:
             price_relatives_flag = False
+        self.window = config["window"]
         self.data_extractor = agent_utils.DataExtractor(data_loader, 
                 timetable, config, config["window"] + 1, price_relatives_flag)
 
@@ -36,12 +37,13 @@ class RmrAgent(Agent):
             alpha = 0
         else:
             alpha = min(0, (np.dot(x_t1, self.last_portfolio) - self.epsilon) / denom)
+        alpha = min(100000, alpha)
         weights = self.last_portfolio - alpha * (x_t1 - np.mean(x_t1))
         return self.weights_projection(weights)
 
     def compute_portfolio(self, epoch):
         data_prices = self.data_extractor(epoch)
-        day_weight = self.rmr_next_weights(data_prices)
+        day_weight = self.rmr_next_weights(data_prices[-self.window:])
         print("rmr weights:", day_weight)
         self.last_portfolio = day_weight.copy()
         preds_dict = {}

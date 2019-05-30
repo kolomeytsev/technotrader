@@ -4,11 +4,13 @@ import time
 
 
 class Trader:
-    def __init__(self, config, data_loader, agent, trade_log=None,
+    def __init__(self, config, data_loader, agent,
+                risk_manager=None, trade_log=None,
                 initial_capital=1.0, waiting_period=0):   
         self.config = config
         self.data_loader = data_loader
         self.agent = agent
+        self.risk_manager = risk_manager
         self.trade_log = trade_log
         self.instruments_list = self.agent.instruments_list
         self.price_label = config["price_label"]
@@ -48,14 +50,20 @@ class Trader:
 
     def transform_weights_dict_to_array(self, weights):
         weights_array = np.array([weights[inst] for inst in self.instruments_list])
-        risk_free_ampunt = 1 - np.abs(weights_array).sum()
-        weights_array = np.append(weights_array, risk_free_ampunt)
+        risk_free_amount = 1 - np.abs(weights_array).sum()
+        weights_array = np.append(weights_array, risk_free_amount)
         return weights_array
 
     def trade_body(self):
         self.current_error_state = 'S000'
         starttime = time.time()
         weights = self.agent.compute_portfolio(self.current_epoch)
+        if self.risk_manager is not None:
+            weights_risks = self.risk_manager.compute_risks(self.current_epoch)
+            risk_adjusted_weights = {}
+            for inst in self.instruments_list:
+                risk_adjusted_weights[inst] = weights[inst] * weights_risks[inst]
+            weights = risk_adjusted_weights
         weights = self.transform_weights_dict_to_array(weights)
         self.execute_trades(weights)
         if not self.__class__.__name__=="BackTester":

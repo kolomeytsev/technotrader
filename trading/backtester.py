@@ -22,8 +22,8 @@ def calculate_pv_after_commission(w1, w0, commission_rate):
 
 
 class BackTester(Trader):
-    def __init__(self, config, data_loader, agent, trade_log=None):
-        super().__init__(config, data_loader, agent, trade_log)
+    def __init__(self, config, data_loader, agent, risk_manager=None, trade_log=None):
+        super().__init__(config, data_loader, agent, risk_manager, trade_log)
         self.test_pc_vector = []
         self.test_pc_vector_no_fee = []
         self.test_turnover_vector = []

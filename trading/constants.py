@@ -69,6 +69,10 @@ AGENTS = {
     'ppt': ('PptAgent', 'algorithms.ppt')
 }
 
+RISK_MANAGERS = {
+    'risk_trend_follow': ('TrendFollowRiskManager', 'risk_managers.risk_trend_follow')
+}
+
 
 LIST_PARAMS = ["instruments_list", "price_label"]
 

@@ -65,6 +65,16 @@ def get_agent_class(agent_class):
     return agent_class
 
 
+def get_risk_manager_class(risk_manager_class):
+    if RISK_MANAGERS.get(risk_manager_class) is not None:
+        class_name, from_file = RISK_MANAGERS[risk_manager_class]
+        risk_manager_class = getattr(importlib.import_module(from_file), class_name)
+    else:
+        print("Risk manager is not available")
+        exit(1)
+    return risk_manager_class
+
+
 def fill_agent_config(config, args, agent_class):
     if args.step is not None:
         step = args.step
@@ -87,6 +97,19 @@ def get_agent(agent_class, agent_config, data_loader, args=None, backtest_config
     print(agent_config)
     agent = Agent(agent_config, data_loader)
     return agent
+
+
+def get_risk_manager(risk_manager_class, risk_manager_config, data_loader, args=None, backtest_config=None):    
+    RiskManager = get_risk_manager_class(risk_manager_class)
+    if backtest_config is not None:
+        if "instruments_list" in backtest_config:
+            risk_manager_config["instruments_list"] = backtest_config["instruments_list"]
+    if args is not None:
+        fill_agent_config(risk_manager_config, args, agent_class)
+    print("risk_manager_config:")
+    print(risk_manager_config)
+    risk_manager = RiskManager(risk_manager_config, data_loader)
+    return risk_manager
 
 
 def get_time_as_name_string(start, end):
@@ -307,7 +330,12 @@ def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
     for agent_class, agent_config in agent_configs:
         agent_name_to_config[agent_config["agent_name"]] = agent_config
         agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
-        backtester = BackTester(backtest_config, data_loader, agent, trade_log=None)
+        if agent_config["trend_tracking"]:
+            risk_manager = get_risk_manager("risk_trend_follow", agent_config, 
+                                            data_loader, args, backtest_config)
+        else:
+            risk_manager = None
+        backtester = BackTester(backtest_config, data_loader, agent, risk_manager, trade_log=None)
         backtesters_list.append(backtester)
     if parallel:
         if args is not None:

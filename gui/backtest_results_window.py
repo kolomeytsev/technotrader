@@ -272,7 +272,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
         }
         return metrics
 
-    def display_computed_metrics(self, metrics, value_format="%.3f"):
+    def display_computed_metrics(self, metrics, value_format="%.4f"):
         numRows = self.tableWidgetMetrics.rowCount()
         self.tableWidgetMetrics.insertRow(numRows)
         for name, value in metrics.items():
@@ -589,7 +589,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             if isinstance(value, str):
                 str_format = "%s"
             elif isinstance(value, float):
-                str_format = "%.3f"
+                str_format = "%.4f"
             elif isinstance(value, int):
                 str_format = "%d"
             else:

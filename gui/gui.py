@@ -292,7 +292,11 @@ class TechnoTraderMainWindow(Ui_MainWindow):
             "short_flag": self.checkBoxUseShorts.isChecked(),
             "neutralize_flag": self.checkUseNeutralization.isChecked(),
             "projection_method": self.comboBoxProjectMethod.currentText(),
-            "top_amount": self.spinBoxTopAmount.value()
+            "top_amount": self.spinBoxTopAmount.value(),
+            "trend_tracking": self.checkBoxTrendTracking.isChecked(),
+            "window_long": self.spinBoxWindowLong.value(),
+            "window_short": self.spinBoxWindowShort.value(),
+            "down_trend_threshold": self.spinBoxDowntrendThreshold.value()
         }
         config_main = {}
         for row in range(self.tableWidgetMainParameters.rowCount()):
