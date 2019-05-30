@@ -442,7 +442,7 @@ class BacktestResultsWindow(QtWidgets.QWidget, Ui_FormPlot):
             return
         data = []
         for instrument in instruments_to_plot:
-            data.append(self.close_prices[instrument]) 
+            data.append(self.close_prices[instrument])
         data = np.array(data).T
         data_normed = data / data[0]
         ubah = data_normed.mean(1)

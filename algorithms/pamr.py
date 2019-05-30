@@ -21,11 +21,11 @@ class PamrAgent(Agent):
         self.use_risk_free = config["use_risk_free"]
         if self.use_risk_free:
             self.instruments_number += 1
-        self.last_portfolio = self.np.ones(self.instruments_number) / self.instruments_number,
+        self.last_portfolio = np.ones(self.instruments_number) / self.instruments_number,
         self.eps = config['mean_reversion_threshold']
         self.C = config['aggressive_param']
         self.variant = config['variant']
-        self.eta = self.np.inf
+        self.eta = np.inf
         self.daily_ret = 1.
         self.n_steps = 0
         self.weights_projection = agent_utils.WeightsProjection(config)
@@ -34,32 +34,27 @@ class PamrAgent(Agent):
                                             timetable, config, 2, True)
 
     def pamr_expert(self, x):
-        weight = self.last_portfolio - self.eta * (x - self.np.mean(x))
-        print(weight)
-        weight = self.simplex_projection(weight)
+        weight = self.last_portfolio - self.eta * (x - np.mean(x))
+        weight = self.weights_projection(weight)
         if (weight < -0.00001).any() or (weight > 1.00001).any():
             str_print = 'pamr_expert: t=%d, sum(weight)=%f, returning uniform weights'
             print(str_print % (t, weight.sum()))
-            return self.np.ones(len(self.last_portfolio)) / len(self.last_portfolio)
-        return weight / sum(weight)
+            return np.ones(len(self.last_portfolio)) / len(self.last_portfolio)
+        return weight / np.abs(weight).sum()
 
     def update_lagrange_multiplier(self, price_ratios):
-        denom_part = price_ratios - self.np.mean(price_ratios)
+        numerator = np.maximum(0., np.dot(self.last_portfolio, price_ratios) - self.eps)
+        denom_part = price_ratios - np.mean(price_ratios)
+        denominator = np.dot(denom_part, denom_part) + 1e-8
         if self.variant == 0:
-            denominator = self.np.dot(denom_part, denom_part)
+            self.eta = numerator / denominator
         elif self.variant == 1:
-            # not yet implemented
-            print("Variant 1 is not implemented, using 0 variant...")
-            denominator = self.np.dot(denom_part, denom_part)
+            self.eta = np.minimum(self.C, numerator / denominator)
         elif self.variant == 2:
-            # not yet implemented
-            print("Variant 2 is not implemented, using 0 variant...")
-            denominator = self.np.dot(denom_part, denom_part)
+            self.eta = numerator / (denominator + 0.5 / self.C)
         else:
-            print("Wrong variant parameter: must be 0, 1 or 2. Exiting.")
+            print("Wrong variant parameter: must be 0, 1 or 2. Exiting")
             return None
-        if denominator != 0:
-            self.eta = (self.daily_ret - self.eps) / denominator
         self.eta = min(1e10, max(0, self.eta))
 
     def compute_portfolio(self, epoch):
@@ -67,13 +62,10 @@ class PamrAgent(Agent):
         data_price_relatives = self.data_extractor(epoch)
         self.update_lagrange_multiplier(data_price_relatives[-1])
         if self.n_steps == 1:
-            day_weight = self.np.ones(self.instruments_number) / self.instruments_number
+            day_weight = np.ones(self.instruments_number) / self.instruments_number
         else:
-            day_weight = self.pamr_expert(data_price_relatives[-1])
-            bt_return = results('backtest', [epoch - self.step])
-            daily_ret = bt_return['return_fee'].values[0]
-            
-        print("weights:", day_weight)
+            day_weight = self.pamr_expert(data_price_relatives[-1])    
+        print("pamr weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
