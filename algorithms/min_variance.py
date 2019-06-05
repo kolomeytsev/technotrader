@@ -103,7 +103,8 @@ class MinVarianceAgent(Agent):
             self.fit_min_variance(epoch)
         self.n_steps += 1
         day_weight = self.min_variance_next_weight()
-        print("weights:", day_weight)
+        if self.verbose:
+            print("min variance weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -100,7 +100,8 @@ class BnnAgent(Agent):
                 self.exp_ret[k_index, l_index] *= np.dot(data_price_relatives[-1], weights)
         day_weight = self.bnn_kernel(data_price_relatives)
         day_weight = self.weights_projection(day_weight)
-        print("bnn weights:", day_weight)
+        if self.verbose:
+            print("bnn weights:", day_weight)
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
             preds_dict[instrument] = day_weight[i]

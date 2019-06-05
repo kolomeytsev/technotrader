@@ -41,15 +41,17 @@ def parse_parameters():
                         help='exchange fee (default=0.001)')
     parser.add_argument('-p', '--path', default=None, type=str,
                         help='dump path (default=None)')
+    parser.add_argument('--csv', default=None, type=str,
+                        help='data csv path (default=None)')
     parser.add_argument('--freq', default=1, type=int,
                         help='dump frequency fee (default=1)')
     parser.add_argument('--short', action='store_const', 
                         const=True, default=False,
                         help='using short (True/False)')
     parser.add_argument('--parallel', action='store_const', 
-                        const=True, default=False,
+                        const=True, default=True,
                         help='parallel computing (True/False)')
-    parser.add_argument('-s', '--processes', default=3, type=int,
+    parser.add_argument('--processes', default=3, type=int,
                         help='number of processes in parallel (default=4)')
     args = parser.parse_args()
     return args
@@ -75,7 +77,7 @@ def get_risk_manager_class(risk_manager_class):
     return risk_manager_class
 
 
-def fill_agent_config(config, args, agent_class):
+def fill_agent_config(config, args):
     if args.step is not None:
         step = args.step
     else:
@@ -83,7 +85,7 @@ def fill_agent_config(config, args, agent_class):
     config["candles_res"] = args.candles_res
     config["step"] = step
     config["exchange"] = args.exchange
-    config["short_flag"] = args.short
+    #config["short_flag"] = args.short
 
 
 def get_agent(agent_class, agent_config, data_loader, args=None, backtest_config=None):    
@@ -92,7 +94,7 @@ def get_agent(agent_class, agent_config, data_loader, args=None, backtest_config
         if "instruments_list" in backtest_config:
             agent_config["instruments_list"] = backtest_config["instruments_list"]
     if args is not None:
-        fill_agent_config(agent_config, args, agent_class)
+        fill_agent_config(agent_config, args)
     print("agent_config:")
     print(agent_config)
     agent = Agent(agent_config, data_loader)
@@ -105,7 +107,7 @@ def get_risk_manager(risk_manager_class, risk_manager_config, data_loader, args=
         if "instruments_list" in backtest_config:
             risk_manager_config["instruments_list"] = backtest_config["instruments_list"]
     if args is not None:
-        fill_agent_config(risk_manager_config, args, agent_class)
+        fill_agent_config(risk_manager_config, args)
     print("risk_manager_config:")
     print(risk_manager_config)
     risk_manager = RiskManager(risk_manager_config, data_loader)
@@ -126,16 +128,22 @@ def convert_time(time_str):
 
 def generate_data_config(args):
     if args.step is not None:
-        step = RESOLUTIONS[args.step]
+        step = args.step
     else:
         step = RESOLUTIONS[args.candles_res]
     data_name = "data"
     data_name += get_time_as_name_string(args.begin, args.end)
     data_name += '_' + str(step) + '_' + args.exchange
+    if args.csv is None:
+        begin = convert_time(args.data_begin)
+        end = convert_time(args.end)
+    else:
+        begin = int(args.data_begin)
+        end = int(args.end)
     config = {
         "data_name": data_name,
-        "begin":  convert_time(args.data_begin),
-        "end":  convert_time(args.end),
+        "begin": begin,
+        "end": end,
         "step": step,
         "candles_res": args.candles_res,
         "candles_res_sec": RESOLUTIONS[args.candles_res],
@@ -149,9 +157,15 @@ def generate_backtest_config(args):
         step = args.step
     else:
         step = RESOLUTIONS[args.candles_res]
+    if args.csv is None:
+        begin = convert_time(args.begin)
+        end = convert_time(args.end)
+    else:
+        begin = int(args.begin)
+        end = int(args.end)
     config = {
-        "begin":  convert_time(args.begin),
-        "end":  convert_time(args.end),
+        "begin":  begin,
+        "end":  end,
         "step": step,
         "fee": args.fee,
         "exchange": args.exchange,
@@ -356,7 +370,12 @@ def main():
     args = parse_parameters()
     data_config, agent_configs, backtest_config = read_configs(args)
     print("data_config", data_config)
-    data_loader = DataLoader(data_config)
+    if args.csv is not None:
+        opened_data = pd.read_csv(args.csv)
+        data_config["type"] = "csv"
+    else:
+        opened_data = None
+    data_loader = DataLoader(data_config, opened_data)
     run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
                         args, args.path, args.parallel)
 

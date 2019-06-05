@@ -262,7 +262,8 @@ class TrendFollowAgent(Agent):
         else:
             print("Wrong sort_method")
             exit(1)
-        print("trend follow weights:", day_weight)
+        if self.verbose:
+            print("trend follow weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

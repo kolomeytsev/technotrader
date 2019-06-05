@@ -26,7 +26,8 @@ RESOLUTIONS = {
     "hour,2": 7200,
     "hour,4": 14400,
     "hour,8": 28800,
-    "day,1": 86400
+    "day,1": 86400,
+    "period": 1
 }
 
 
@@ -41,10 +42,13 @@ AGENTS = {
     'bmar1': ('Bmar1Agent', 'algorithms.bmar1'),
     'bmar2': ('Bmar2Agent', 'algorithms.bmar2'),
     'olmar1': ('Olmar1Agent', 'algorithms.olmar1'),
+    'olmar1_shorts': ('Olmar1ShortsAgent', 'algorithms.olmar1_shorts'),
     'olmar2': ('Olmar2Agent', 'algorithms.olmar2'),
     'rmr': ('RmrAgent', 'algorithms.rmr'),
+    'rmr_shorts': ('RmrShortsAgent', 'algorithms.rmr_shorts'),
     'rmr_trend_follow': ('RmrTrendFollowAgent', 'algorithms.rmr_trend_follow'),
     'pamr': ('PamrAgent', 'algorithms.pamr'),
+    'pamr_shorts': ('PamrShortsAgent', 'algorithms.pamr_shorts'),
     'wmamr': ('WmamrAgent', 'algorithms.wmamr'),
     'cwmr_var': ('CwmrVarAgent', 'algorithms.cwmr_var'),
     'cwmr_std': ('CwmrStdAgent', 'algorithms.cwmr_std'),

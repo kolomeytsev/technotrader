@@ -63,7 +63,8 @@ class OnsAgent(Agent):
     def compute_portfolio(self, epoch):
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.ons_next_weight(data_price_relatives[-1])
-        print("ons weights:", day_weight)
+        if self.verbose:
+            print("ons weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -13,6 +13,10 @@ class TrendFollowRiskManager(Agent):
     def __init__(self, config, data_loader, trade_log=None):
         super().__init__(config, data_loader)
         self.instruments_list = config["instruments_list"]
+        self.verbose = False
+        if config.get("verbose") is not None:
+            if config["verbose"]:
+                self.verbose = True
         self.window_long = config['window_long']
         self.window_short = config['window_short']
         assert self.window_long > self.window_short, \
@@ -44,7 +48,8 @@ class TrendFollowRiskManager(Agent):
     def compute_risks(self, epoch):
         data_prices = self.data_extractor(epoch)
         weights = self.check_trend(data_prices)
-        print("risk weights:", weights)
+        if self.verbose:
+            print("risk weights:", weights)
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
             preds_dict[instrument] = weights[i]

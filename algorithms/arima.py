@@ -90,8 +90,9 @@ class ArimaAgent(Agent):
         data_prices = self.data_extractor(epoch)
         data_prices /= data_prices[0]
         day_weight = self.predict_next_weight(data_prices)
-        print("predicted weights:", day_weight)
-        print("arima model weights:", self.arima.weights)
+        if self.verbose:
+            print("predicted weights:", day_weight)
+            print("arima model weights:", self.arima.weights)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

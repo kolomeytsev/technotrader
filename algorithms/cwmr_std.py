@@ -86,7 +86,8 @@ class CwmrStdAgent(Agent):
     def compute_portfolio(self, epoch):
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.cwmr_next_weight(data_price_relatives)
-        print("cwmr-std weights:", day_weight)
+        if self.verbose:
+            print("cwmr-std weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

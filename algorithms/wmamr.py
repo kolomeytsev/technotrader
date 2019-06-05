@@ -23,8 +23,8 @@ class WmamrAgent(PamrAgent):
             day_weight = np.ones(self.instruments_number) / self.instruments_number
         else:   
             day_weight = self.pamr_expert(data_price_relatives_mean)
-            
-        print("wmamr weights:", day_weight)
+        if self.verbose:
+            print("wmamr weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

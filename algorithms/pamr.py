@@ -36,9 +36,9 @@ class PamrAgent(Agent):
     def pamr_expert(self, x):
         weight = self.last_portfolio - self.eta * (x - np.mean(x))
         weight = self.weights_projection(weight)
-        if (weight < -0.00001).any() or (weight > 1.00001).any():
+        if (weight < -1.000001).any() or (weight > 1.00001).any():
             str_print = 'pamr_expert: t=%d, sum(weight)=%f, returning uniform weights'
-            print(str_print % (t, weight.sum()))
+            print(str_print % (self.n_steps, weight.sum()))
             return np.ones(len(self.last_portfolio)) / len(self.last_portfolio)
         return weight / np.abs(weight).sum()
 
@@ -64,8 +64,9 @@ class PamrAgent(Agent):
         if self.n_steps == 1:
             day_weight = np.ones(self.instruments_number) / self.instruments_number
         else:
-            day_weight = self.pamr_expert(data_price_relatives[-1])    
-        print("pamr weights:", day_weight)
+            day_weight = self.pamr_expert(data_price_relatives[-1])
+        if self.verbose: 
+            print("pamr shorts weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

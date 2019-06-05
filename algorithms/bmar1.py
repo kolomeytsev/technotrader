@@ -75,7 +75,8 @@ class Bmar1Agent(Agent):
         self.n_steps += 1
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.bmar1_next_weight(data_price_relatives)
-        print("bmar1 weights", day_weight)
+        if self.verbose:
+            print("bmar1 weights", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

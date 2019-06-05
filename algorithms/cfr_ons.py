@@ -26,10 +26,6 @@ class CfrOnsAgent(Agent):
         self.compute_L1_median = agent_utils.compute_L1_median
         timetable = agent_utils.ExchangeTimetable(config["exchange"])
         self.weights_projection = agent_utils.WeightsProjection(config)
-        if config.get("verbose") is not None:
-            self.verbose = config["verbose"]
-        else:
-            self.verbose = False
         self.epsilon = config['epsilon']
         self.window = config['window']
         self.arma = self.init_arima_model(config["config_arma"])
@@ -197,7 +193,8 @@ class CfrOnsAgent(Agent):
         data_prices = self.data_extractor(epoch)
         data_prices /= data_prices[0]
         day_weight = self.predict_next_weight(data_prices)
-        print("cfr-ons weights:", day_weight)
+        if self.verbose:
+            print("cfr-ons weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -56,7 +56,8 @@ class BahAnticorAgent(Agent):
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.anticor_kernel(data_price_relatives)
         day_weight = self.weights_projection(day_weight)
-        print("bah anticor weights:", day_weight)
+        if self.verbose:
+            print("bah anticor weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -86,8 +86,9 @@ class ArmaAgent(Agent):
         data_prices = self.data_extractor(epoch)
         data_prices /= data_prices[0]
         day_weight = self.predict_next_weight(data_prices)
-        print("predicted weights:", day_weight)
-        print("arma model weights:", self.arma.weights)
+        if self.verbose:
+            print("predicted weights:", day_weight)
+            print("arma model weights:", self.arma.weights)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

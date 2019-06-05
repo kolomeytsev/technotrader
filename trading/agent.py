@@ -9,6 +9,10 @@ class Agent:
         self.config = config
         self.data_loader = data_loader
         self.trade_log = trade_log
+        if config.get("verbose") is not None:
+            self.verbose = config["verbose"]
+        else:
+            self.verbose = False
 
     def compute_portfolio(self, epoch):
         raise NotImplementedError()

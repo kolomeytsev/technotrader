@@ -148,7 +148,8 @@ class MarkowitzAgent(Agent):
             self.fit_markowitz(epoch)
         self.n_steps += 1
         day_weight = self.markowitz_next_weight()
-        print("markowitz weights:", day_weight)
+        if self.verbose:
+            print("markowitz weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -44,7 +44,8 @@ class RmrAgent(Agent):
     def compute_portfolio(self, epoch):
         data_prices = self.data_extractor(epoch)
         day_weight = self.rmr_next_weights(data_prices[-self.window:])
-        print("rmr weights:", day_weight)
+        if self.verbose:
+            print("rmr weights:", day_weight)
         self.last_portfolio = day_weight.copy()
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -181,7 +181,8 @@ class MetaEgOnsAgent(Agent):
         self.n_steps += 1
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.predict_next_weights(data_price_relatives)
-        print("meta_eg_ons weights:", day_weight)
+        if self.verbose:
+            print("meta_eg_ons weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

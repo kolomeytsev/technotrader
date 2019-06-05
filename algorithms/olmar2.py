@@ -40,7 +40,8 @@ class Olmar2Agent(Agent):
     def compute_portfolio(self, epoch):
         data_price_relatives = self.data_extractor(epoch)
         day_weight = self.olmar2_next_weight(data_price_relatives.ravel())
-        print("olmar2:", day_weight)
+        if self.verbose:
+            print("olmar2:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

@@ -72,7 +72,8 @@ class MaxReturnAgent(Agent):
             self.fit_max_return(epoch)
         self.n_steps += 1
         day_weight = self.max_return_next_weight()
-        print("max_return weights:", day_weight)
+        if self.verbose:
+            print("max_return weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

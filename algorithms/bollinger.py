@@ -94,8 +94,9 @@ class BollingerAgent(Agent):
     def compute_portfolio(self, epoch):
         self.n_steps += 1
         data_prices = self.data_extractor(epoch)
-        day_weight = self.bollinger_next_weight(data_prices) 
-        print("bollinger weights:", day_weight)
+        day_weight = self.bollinger_next_weight(data_prices)
+        if self.verbose:
+            print("bollinger weights:", day_weight)
         self.last_portfolio = day_weight
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

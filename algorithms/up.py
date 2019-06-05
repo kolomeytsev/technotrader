@@ -56,7 +56,8 @@ class UpAgent(Agent):
         data_price_relatives = self.data_extractor(epoch, self.n_steps)
         day_weight = self.up_next_weight(data_price_relatives)
         day_weight = self.weights_projection(day_weight)
-        print("up weights:", day_weight)
+        if self.verbose:
+            print("up weights:", day_weight)
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):
             preds_dict[instrument] = day_weight[i]

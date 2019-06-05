@@ -1,0 +1,36 @@
+{
+    "agents": [
+        "olmar1", "olmar2",
+        "bmar1", "bmar2",
+        "arma", "arima",
+        "rmr",
+        "pamr",
+        "anticor",
+        "wmamr",
+        "cwmr_var",
+        "cwmr_std",
+        "cfr_ogd",
+        "cfr_ons"
+    ],
+    "configs": [
+        "configs/moex_trend/olmar1.json",
+        "configs/moex_trend/olmar2.json",
+        "configs/moex_trend/bmar1.json",
+        "configs/moex_trend/bmar2.json",
+        "configs/moex_trend/arma.json",
+        "configs/moex_trend/arima.json",
+        "configs/moex_trend/rmr.json",
+        "configs/moex_trend/pamr.json",
+        "configs/moex_trend/anticor.json",
+        "configs/moex_trend/wmamr.json",
+        "configs/moex_trend/cwmr.json",
+        "configs/moex_trend/cwmr.json",
+        "configs/moex_trend/cfr_ogd.json",
+        "configs/moex_trend/cfr_ons.json"
+    ],
+    "instruments_list": [
+        "FEES", "PLZL", "LKOH", "ROSN", "GMKN", "POLY", "MAGN", "RSTI", "MGNT", "ALRS",
+        "MSNG", "NVTK", "MVID", "HYDR", "RTKM", "VTBR", "PHOR", "CHMF", "AFLT", "SNGS", 
+        "MTSS", "RASP", "MFON", "NLMK", "TATN", "SBER", "GAZP", "SIBN", "MOEX", "IRAO"
+    ]
+}

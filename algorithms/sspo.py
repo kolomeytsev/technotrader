@@ -62,7 +62,8 @@ class SspoAgent(Agent):
         self.n_step += 1
         data_prices = self.data_extractor(epoch)
         day_weight = self.sspo_next_weight(data_prices)
-        print("sspo weights:", day_weight)
+        if self.verbose:
+            print("sspo weights:", day_weight)
         self.last_portfolio = day_weight.copy()
         preds_dict = {}
         for i, instrument in enumerate(self.instruments_list):

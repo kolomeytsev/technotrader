@@ -27,5 +27,6 @@ class CrpAgent(Agent):
             self.preds_dict[instrument] = float(self.weights[i])
 
     def compute_portfolio(self, epoch):
-        print("crp epoch:", datetime.datetime.fromtimestamp(epoch))
+        if self.verbose:
+            print("crp epoch:", datetime.datetime.fromtimestamp(epoch))
         return self.preds_dict

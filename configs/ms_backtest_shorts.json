@@ -1,0 +1,23 @@
+{
+    "agents": [
+        "olmar1",
+        "olmar1_shorts",
+        "rmr",
+        "rmr_shorts",
+        "pamr",
+        "pamr_shorts"
+    ],
+    "configs": [
+        "configs/moex_shorts/olmar1.json",
+        "configs/moex_shorts/olmar1_shorts.json",
+        "configs/moex_shorts/rmr.json",
+        "configs/moex_shorts/rmr_shorts.json",
+        "configs/moex_shorts/pamr.json",
+        "configs/moex_shorts/pamr_shorts.json"
+    ],
+    "instruments_list": [
+        "FEES", "PLZL", "LKOH", "ROSN", "GMKN", "POLY", "MAGN", "RSTI", "MGNT", "ALRS",
+        "MSNG", "NVTK", "MVID", "HYDR", "RTKM", "VTBR", "PHOR", "CHMF", "AFLT", "SNGS", 
+        "MTSS", "RASP", "MFON", "NLMK", "TATN", "SBER", "GAZP", "SIBN", "MOEX", "IRAO"
+    ]
+}
