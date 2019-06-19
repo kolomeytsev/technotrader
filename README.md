@@ -13,7 +13,7 @@ Python 3.6 on MacOS is supported.
 ## Installation
 
  * Download or clone the latest version from [GitHub](https://github.com/kolomeytsev/technotrader/).
- * Run the platform via ```python main.py```
+ * Run the platform via ```python run_gui.py```
  
 ## User Guide
 
