@@ -1,0 +1,44 @@
+{
+    "agents": [
+        "arma",
+        "arima",
+        "olmar1",
+        "olmar2",
+        "bmar1",
+        "bmar2",
+        "anticor",
+        "crp",
+        "rmr",
+        "sspo",
+        "cfr_ogd",
+        "cfr_ons",
+        "trend_follow",
+        "bollinger",
+        "pamr",
+        "wmamr"
+    ],
+    "configs": [
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/arma.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/arima.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/olmar1.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/olmar2.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/bmar1.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/bmar2.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/anticor.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/crp.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/rmr.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/sspo.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/cfr_ogd.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/cfr_ons.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/trend_follow.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/bollinger.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/pamr.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/wmamr.json"
+    ],
+    "instruments_list": [
+        "BNB/BTC", "ETH/BTC", "LTC/BTC", "NEO/BTC", "WTC/BTC", "ZRX/BTC", 
+        "LINK/BTC", "IOTA/BTC", "EOS/BTC", "ETC/BTC", "DASH/BTC", "TRX/BTC", 
+        "XRP/BTC", "ENJ/BTC", "XMR/BTC", "BAT/BTC", "ZEC/BTC", "ARN/BTC", 
+        "ADA/BTC", "XLM/BTC", "WAVES/BTC", "ICX/BTC", "NANO/BTC", "ZIL/BTC", "ONT/BTC"
+    ]
+}

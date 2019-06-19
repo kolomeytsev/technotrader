@@ -1,0 +1,1 @@
+{"instruments_list": ["ETH/BTC", "XRP/BTC"], "price_label": "close", "use_risk_free": false, "short_flag": false, "neutralize_flag": true, "projection_method": "simplex", "top_amount": 1, "learning_rate": 10, "mixture": 0.0, "tradeoff": 1.0, "heuristic_tuning": 0.125, "window": [5, 10, 20], "update_method": "eg", "meta_update_parameter": 100.0}

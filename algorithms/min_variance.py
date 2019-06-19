@@ -3,6 +3,7 @@ import pandas as pd
 from technotrader.trading.agent import Agent
 import technotrader.utils.agent_utils as agent_utils
 import cvxopt
+import warnings
 
 
 class MinVarianceAgent(Agent):

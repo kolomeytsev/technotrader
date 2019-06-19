@@ -4,6 +4,7 @@ from technotrader.trading.agent import Agent
 import technotrader.utils.agent_utils as agent_utils
 import cvxopt as opt
 from cvxopt import solvers
+import warnings
 
 
 class MarkowitzAgent(Agent):

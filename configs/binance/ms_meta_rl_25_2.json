@@ -1,0 +1,22 @@
+{
+    "agents": [
+        "markowitz",
+        "max_return",
+        "meta_eg",
+        "meta_ons",
+        "min_variance"
+    ],
+    "configs": [
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/markowitz.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/max_return.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/meta_eg.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/meta_ons.json",
+        "/Users/kolomeytsev/olps/technotrader/configs/binance/params_search/min_variance.json"
+    ],
+    "instruments_list": [
+        "BNB/BTC", "ETH/BTC", "LTC/BTC", "NEO/BTC", "WTC/BTC", "ZRX/BTC", 
+        "LINK/BTC", "IOTA/BTC", "EOS/BTC", "ETC/BTC", "DASH/BTC", "TRX/BTC", 
+        "XRP/BTC", "ENJ/BTC", "XMR/BTC", "BAT/BTC", "ZEC/BTC", "ARN/BTC", 
+        "ADA/BTC", "XLM/BTC", "WAVES/BTC", "ICX/BTC", "NANO/BTC", "ZIL/BTC", "ONT/BTC"
+    ]
+}

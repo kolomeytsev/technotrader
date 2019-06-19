@@ -344,7 +344,7 @@ def run_multi_backtest(data_loader, data_config, agent_configs, backtest_config,
     for agent_class, agent_config in agent_configs:
         agent_name_to_config[agent_config["agent_name"]] = agent_config
         agent = get_agent(agent_class, agent_config, data_loader, args, backtest_config)
-        if agent_config["trend_tracking"]:
+        if agent_config.get("trend_tracking"):
             risk_manager = get_risk_manager("risk_trend_follow", agent_config, 
                                             data_loader, args, backtest_config)
         else:
